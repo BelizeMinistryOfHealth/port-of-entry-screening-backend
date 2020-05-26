@@ -76,19 +76,19 @@ func TestFirestoreClient_FindByName(t *testing.T) {
 	client := CreateClient(context.Background(), "epi-belize")
 	defer client.Close()
 
-	res, err := client.FindByName("port-of-entry-screening", "Roberto", "Guerra")
+	res, err := client.FindByLastName("port-of-entry-screening", "Guerra")
 	if err != nil {
-		t.Fatalf("FindByName() error: %v", err)
+		t.Fatalf("FindByLastName() error: %v", err)
 	}
 
 	if len(res) == 0 {
-		t.Fatalf("FindByName() result size: got: %d, want: 1", len(res))
+		t.Fatalf("FindByLastName() result size: got: %d, want: 1", len(res))
 	}
 
 	personalInfo := res[0].PersonalInfo
 
 	if personalInfo.FirstName != "Roberto" && personalInfo.LastName != "Guerra" {
-		t.Errorf("FindByName() got: %s, want: Roberto Guerra",
+		t.Errorf("FindByLastName() got: %s, want: Roberto Guerra",
 			fmt.Sprintf("%s %s", personalInfo.FirstName, personalInfo.LastName))
 	}
 

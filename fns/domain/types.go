@@ -37,6 +37,7 @@ type PersonalInfo struct {
 	FirstName         string     `json:"first_name"`
 	MiddleNameInitial string     `json:"middle_name_initial, omitempty"`
 	LastName          string     `json:"last_name"`
+	FullName          string     `json:"full_name"`
 	PassportNumber    string     `json:"passport_number"`
 	Dob               SimpleTime `json:"dob"`
 	Nationality       string     `json:"nationality"`
