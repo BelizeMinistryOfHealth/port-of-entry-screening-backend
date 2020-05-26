@@ -1,0 +1,40 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - kms
+      - decrypt
+      - --ciphertext-file=env.production.yaml.enc
+      - --plaintext-file=./fns/env.yaml
+      - --location=global
+      - --keyring=${_KEYRING}
+      - --key=${_KEY}
+      - --verbosity=debug
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "Ingest Fn"
+    args: 
+    - functions
+    - deploy
+    - 'ingest'
+    - --trigger-http
+    - --runtime=go113
+    - --entry-point=Ingest
+    - --region=us-east1
+    - --env-vars-file=env.yaml
+    - --allow-unauthenticated
+    dir: ./fns
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "Find By Port of Entry Fn"
+    args:
+      - functions
+      - deploy
+      - 'byPortOfEntry'
+      - --trigger-http
+      - --runtime=go113
+      - --entry-point=FindByPortOfEntry
+      - --region=us-east1
+      - --env-vars-file=env.yaml
+      - --allow-unauthenticated
+    dir: ./fns
+substitutions:
+  _KEYRING: functions-deployment
+  _KEY: entry-screening-func
