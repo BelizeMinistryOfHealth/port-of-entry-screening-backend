@@ -35,6 +35,19 @@ steps:
       - --env-vars-file=env.yaml
       - --allow-unauthenticated
     dir: ./fns
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "Find By Name"
+    args:
+      - functions
+      - deploy
+      - 'findByName'
+      - --trigger-http
+      - --runtime=go113
+      - --entry-point=FindByName
+      - --region=us-east1
+      - --env-vars-file=env.yaml
+      - --allow-unauthenticated
+    dir: ./fns
 substitutions:
   _KEYRING: functions-deployment
   _KEY: entry-screening-func
