@@ -121,3 +121,29 @@ func (c FirestoreClient) FindByPortOfEntry(col, loc string) ([]domain.Arrival, e
 	}
 	return arrivals, nil
 }
+
+// List retrieves a list of records ordered in descending order by their id.
+// The `id` is the record to start after. It is useful for paginating results.
+func (c FirestoreClient) List(col, id string) ([]domain.Arrival, error) {
+	arrivals := []domain.Arrival{}
+	it := c.client.Collection(col).
+		OrderBy("Id", firestore.Desc).
+		StartAfter(id).
+		Limit(25).
+		Documents(c.ctx)
+
+	for {
+		doc, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		var a domain.Arrival
+		doc.DataTo(&a)
+
+		arrivals = append(arrivals, a)
+	}
+	return arrivals, nil
+}

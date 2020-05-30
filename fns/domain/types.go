@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -34,6 +35,7 @@ type ArrivalInfo struct {
 }
 
 type PersonalInfo struct {
+	Id                string     `json:"id, omitempty"`
 	FirstName         string     `json:"first_name"`
 	MiddleNameInitial string     `json:"middle_name_initial, omitempty"`
 	LastName          string     `json:"last_name"`
@@ -77,4 +79,82 @@ type Arrival struct {
 	AddressInBelize      *AddressInBelize `json:"address_in_belize, omitempty"`
 	Screening            []Screening      `json:"screening"`
 	TravellingCompanions []PersonalInfo   `json:"travelling_companions, omitempty"`
+}
+
+type NewArrival struct {
+	Id                   string           `json:"id"`
+	ArrivalInfo          *ArrivalInfo     `json:"arrival_info, omitempty"`
+	PersonalInfo         PersonalInfo     `json:"personal_info"`
+	AddressInBelize      *AddressInBelize `json:"address_in_Belize, omitempty"`
+	Screening            []Screening      `json:"screening"`
+	TravellingCompanions []string         `json:"travelling_companions, omitempty"`
+}
+
+func Index(vs []string, t NewArrival) int {
+	for i, v := range vs {
+		if v == t.Id {
+			return i
+		}
+	}
+	return -1
+}
+
+func Include(vs []string, t NewArrival) bool {
+	return Index(vs, t) >= 0
+}
+
+func Filter(vs []NewArrival, f func(NewArrival) bool) []NewArrival {
+	vsf := make([]NewArrival, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
+}
+
+func Map(vs []NewArrival, f func(arrival NewArrival) PersonalInfo) []PersonalInfo {
+	vsm := make([]PersonalInfo, len(vs))
+	for i, v := range vs {
+		vsm[i] = f(v)
+	}
+	return vsm
+}
+
+// MapToPersonalInfo retrieves the PersonalInfo from an array of NewArrivals for the
+// corresponding Id.
+func MapToPersonalInfo(arrival NewArrival, info []NewArrival) []PersonalInfo {
+
+	arrivals := Filter(info, func(arr NewArrival) bool {
+		return arrival.Id != arr.Id && Include(arrival.TravellingCompanions, arr)
+	})
+
+	return Map(arrivals, func(arrival NewArrival) PersonalInfo {
+		arrival.PersonalInfo.Id = arrival.Id
+		arrival.PersonalInfo.FullName = fmt.Sprintf("%s %s", arrival.PersonalInfo.FirstName, arrival.PersonalInfo.LastName)
+		return arrival.PersonalInfo
+	})
+
+}
+
+// HydrateCompanions takes an array of NewArrivals
+// and hydrates their travelling companions with the
+// matching PersonalInfo. It returns an array of Arrival
+// with the enriched TravellingCompanions.
+func HydrateCompanions(arrs []NewArrival) []Arrival {
+	arrivals := make([]Arrival, 0)
+	for _, v := range arrs {
+		infos := MapToPersonalInfo(v, arrs)
+
+		arrival := Arrival{
+			Id:                   v.Id,
+			ArrivalInfo:          v.ArrivalInfo,
+			PersonalInfo:         v.PersonalInfo,
+			AddressInBelize:      v.AddressInBelize,
+			Screening:            v.Screening,
+			TravellingCompanions: infos,
+		}
+		arrivals = append(arrivals, arrival)
+	}
+	return arrivals
 }

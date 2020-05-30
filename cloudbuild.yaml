@@ -14,10 +14,10 @@ steps:
     args: 
     - functions
     - deploy
-    - 'ingest'
+    - 'arrivals'
     - --trigger-http
     - --runtime=go113
-    - --entry-point=Ingest
+    - --entry-point=Arrivals
     - --region=us-east1
     - --env-vars-file=env.yaml
     - --allow-unauthenticated
