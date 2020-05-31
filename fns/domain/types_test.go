@@ -1,18 +1,13 @@
-package persistence
+package domain_test
 
 import (
-	"context"
-	"fmt"
 	"testing"
 	"time"
 
 	"bz.epi.covid.screen/arrivals/domain"
 )
 
-func TestFirestoreClient_UpsertArrival(t *testing.T) {
-	client := CreateClient(context.Background(), "epi-belize")
-	defer client.Close()
-
+func TestHydrateCompanions(t *testing.T) {
 	dateLayout := "2006-01-02"
 	dob, _ := time.Parse(dateLayout, "1977-04-15")
 	dateScreened, _ := time.Parse(dateLayout, "2020-05-24")
@@ -111,70 +106,11 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 	}
 
 	arrivals := domain.HydrateCompanions([]domain.NewArrival{newArrival, companion})
-	err := client.UpsertArrival("port-of-entry-screening", arrivals)
 
-	if err != nil {
-		t.Fatalf("UpsertArrival() failed. want nil got %v", err)
+	first := arrivals[0]
+	second := arrivals[1]
+
+	if first.TravellingCompanions[0].FirstName != second.PersonalInfo.FirstName {
+		t.Errorf("names did not match")
 	}
-}
-
-func TestFirestoreClient_FindByName(t *testing.T) {
-	client := CreateClient(context.Background(), "epi-belize")
-	defer client.Close()
-
-	res, err := client.FindByLastName("port-of-entry-screening", "Guerra")
-	if err != nil {
-		t.Fatalf("FindByLastName() error: %v", err)
-	}
-
-	if len(res) == 0 {
-		t.Fatalf("FindByLastName() result size: got: %d, want: 1", len(res))
-	}
-
-	personalInfo := res[0].PersonalInfo
-
-	if personalInfo.FirstName != "Roberto" && personalInfo.LastName != "Guerra" {
-		t.Errorf("FindByLastName() got: %s, want: Roberto Guerra",
-			fmt.Sprintf("%s %s", personalInfo.FirstName, personalInfo.LastName))
-	}
-
-	dob := personalInfo.Dob.Format("2006-01-02")
-	if dob != "1977-04-15" {
-		t.Errorf("Could not parse dob, got: %s, want: %s", dob, "1977-04-15")
-	}
-
-	t.Logf("Results: %v", res)
-}
-
-func TestFirestoreClient_FindByScreeningLocation(t *testing.T) {
-	client := CreateClient(context.Background(), "epi-belize")
-	defer client.Close()
-
-	res, err := client.FindByPortOfEntry("port-of-entry-screening", "pgia")
-	if err != nil {
-		t.Fatalf("FindByPortOfEntry error: %v", err)
-	}
-
-	if len(res) == 0 {
-		t.Fatalf("FindByPortOfEntry got: %d, want: 1", len(res))
-	}
-
-	portOfEntry := res[0].ArrivalInfo.PortOfEntry
-
-	if portOfEntry != "pgia" {
-		t.Errorf("FindByPorfOfEntry got: %s, want: pgia", portOfEntry)
-	}
-}
-
-func TestPaginateQuery(t *testing.T) {
-	client := CreateClient(context.Background(), "epi-belize")
-	defer client.Close()
-
-	arrivals, err := client.List("port-of-entry-screening", "2020-05-23%23Mau-Xhi%2399119911")
-
-	if err != nil {
-		t.Fatalf("error listing arrivals: %+v", err)
-	}
-
-	t.Logf("Arrivals: %+v", arrivals)
 }
