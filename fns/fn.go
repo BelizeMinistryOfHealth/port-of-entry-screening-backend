@@ -36,7 +36,16 @@ func Arrivals(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, client_id, client_secret")
 
+	log.WithFields(log.Fields{
+		"headers": r.Header,
+	}).Info("Got a request for arrivals")
+
 	if len(clientId) == 0 && len(secret) == 0 {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	if secret != os.Getenv(strings.ToTitle(clientId)) {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
