@@ -27,6 +27,17 @@ type ArrivalList struct {
 	NextPage string           `json:"next_page"`
 }
 
+func doAuth(clientId, secret string, r *http.Request) error {
+	if len(clientId) == 0 && len(secret) == 0 {
+		return fmt.Errorf("unauthorized: no credentials provided")
+	}
+
+	if secret != os.Getenv(strings.ToTitle(clientId)) {
+		return fmt.Errorf("unauthorized: wrong credentials provided")
+	}
+	return nil
+}
+
 func Arrivals(w http.ResponseWriter, r *http.Request) {
 	projectId := os.Getenv("PROJECT_ID")
 	collection := os.Getenv("DB_COLLECTION")
@@ -57,13 +68,23 @@ func Arrivals(w http.ResponseWriter, r *http.Request) {
 	dbClient := persistence.CreateClient(r.Context(), projectId)
 	switch method := r.Method; method {
 	case http.MethodPost:
-		_, err := UpsertArrival(dbClient, collection, r)
+		err := doAuth(clientId, secret, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		_, err = UpsertArrival(dbClient, collection, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		fmt.Fprintf(w, "ok")
 	case http.MethodGet:
+		err := doAuth(clientId, secret, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
 		arrivals, err := ListArrivals(dbClient, collection, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
