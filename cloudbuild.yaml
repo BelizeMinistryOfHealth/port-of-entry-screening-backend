@@ -10,7 +10,7 @@ steps:
       - --key=${_KEY}
       - --verbosity=debug
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: "Ingest Fn"
+    id: "Arrivals Fn"
     args: 
     - functions
     - deploy

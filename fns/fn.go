@@ -51,16 +51,6 @@ func Arrivals(w http.ResponseWriter, r *http.Request) {
 		"headers": r.Header,
 	}).Info("Got a request for arrivals")
 
-	if len(clientId) == 0 && len(secret) == 0 {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	if secret != os.Getenv(strings.ToTitle(clientId)) {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	if len(collection) == 0 {
 		http.Error(w, "could not find the collection", http.StatusInternalServerError)
 		return
