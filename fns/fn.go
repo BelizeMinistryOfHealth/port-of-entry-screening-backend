@@ -33,7 +33,7 @@ func Arrivals(w http.ResponseWriter, r *http.Request) {
 	clientId := r.Header.Get("client_id")
 	secret := r.Header.Get("client_secret")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, client_id, client_secret")
 
 	if len(clientId) == 0 && len(secret) == 0 {
