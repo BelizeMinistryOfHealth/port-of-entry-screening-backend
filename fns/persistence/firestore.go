@@ -23,6 +23,7 @@ type FirestoreDb interface {
 	CreateClient(ctx context.Context, projectID string) FirestoreClient
 	FindByName(first string, last string) ([]domain.Arrival, error)
 	FindByPortOfEntry(col, loc string) ([]domain.Arrival, error)
+	SaveScreening(col, id string, screening domain.Screening) error
 	Close() error
 }
 
@@ -146,4 +147,23 @@ func (c FirestoreClient) List(col, id string) ([]domain.Arrival, error) {
 		arrivals = append(arrivals, a)
 	}
 	return arrivals, nil
+}
+
+func (c FirestoreClient) SaveScreening(col, id string, screening domain.Screening) error {
+	docRef, _ := c.client.Collection(col).Doc(id).Get(c.ctx)
+	var arrival domain.Arrival
+	docRef.DataTo(&arrival)
+
+	var screenings = arrival.Screening
+
+	screenings = append(screenings, screening)
+
+	_, err := c.client.Collection(col).Doc(id).Set(c.ctx, map[string]interface{}{
+		"Screening": screenings,
+	}, firestore.MergeAll)
+
+	if err != nil {
+		return fmt.Errorf("failed to update screenings: %v", err)
+	}
+	return nil
 }

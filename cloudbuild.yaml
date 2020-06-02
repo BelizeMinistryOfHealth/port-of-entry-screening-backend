@@ -48,6 +48,19 @@ steps:
       - --env-vars-file=env.yaml
       - --allow-unauthenticated
     dir: ./fns
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "Save Screening"
+    args:
+      - functions
+      - deploy
+      - 'screening'
+      - --trigger-http
+      - --runtime=go113
+      - --entry-point=AddScreening
+      - --region=us-east1
+      - --env-vars-file=env.yaml
+      - --allow-unauthenticated
+    dir: ./fns
 substitutions:
   _KEYRING: functions-deployment
   _KEY: entry-screening-func

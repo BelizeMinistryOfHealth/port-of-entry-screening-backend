@@ -178,3 +178,34 @@ func TestPaginateQuery(t *testing.T) {
 
 	t.Logf("Arrivals: %+v", arrivals)
 }
+
+func TestFirestoreClient_SaveScreening(t *testing.T) {
+	client := CreateClient(context.Background(), "epi-belize")
+	defer client.Close()
+
+	dateLayout := "2006-01-02"
+	dateScreened, _ := time.Parse(dateLayout, "2020-06-01")
+	screening := domain.Screening{
+		FluLikeSymptoms: domain.FluLikeSymptoms{
+			Fever:            false,
+			Headache:         false,
+			Cough:            false,
+			Malaise:          false,
+			SoreThroat:       false,
+			BreathShort:      false,
+			BreathDifficulty: false,
+			Other:            "",
+		},
+		OtherSymptoms:             "",
+		DiagnosedWithCovid19:      false,
+		ContactWithHealthFacility: false,
+		Comments:                  "",
+		Location:                  "Radisson Hotel",
+		DateScreened:              domain.SimpleTime{dateScreened},
+	}
+	err := client.SaveScreening("port-of-entry-screening", "2020-05-30#Mig-Sag#97119911", screening)
+
+	if err != nil {
+		t.Errorf("SaveScreening() failed: %v", err)
+	}
+}

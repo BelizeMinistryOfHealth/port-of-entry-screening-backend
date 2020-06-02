@@ -45,11 +45,7 @@ func Arrivals(w http.ResponseWriter, r *http.Request) {
 	secret := r.Header.Get("client_secret")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	//w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, client_id, client_secret")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
-	log.WithFields(log.Fields{
-		"headers": r.Header,
-	}).Info("Got a request for arrivals")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, client_id, client_secret")
 
 	if len(collection) == 0 {
 		http.Error(w, "could not find the collection", http.StatusInternalServerError)
@@ -285,4 +281,79 @@ func FindByName(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprintf(w, string(resp))
+}
+
+type SaveScreeningReq struct {
+	Id        string           `json:"id"`
+	Screening domain.Screening `json:"screening"`
+}
+
+func SaveScreening(dbClient *persistence.FirestoreClient, collection string, r *http.Request) error {
+	var req SaveScreeningReq
+
+	// Read body
+	body := r.Body
+	b, err := ioutil.ReadAll(body)
+	defer body.Close()
+	if err != nil {
+		return fmt.Errorf("could not parse the body posted: %v", err)
+	}
+
+	err = json.Unmarshal(b, &req)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"body":  string(b),
+			"error": err,
+		}).Error("could not unmarshall the body posted")
+		return fmt.Errorf("could not unmarshall the body posted: %v", err)
+	}
+
+	screening := req.Screening
+
+	err = dbClient.SaveScreening(collection, req.Id, screening)
+	if err != nil {
+		return fmt.Errorf("error saving newArrivals information: %v", err)
+	}
+	return nil
+}
+
+func AddScreening(w http.ResponseWriter, r *http.Request) {
+	projectId := os.Getenv("PROJECT_ID")
+	collection := os.Getenv("DB_COLLECTION")
+	clientId := r.Header.Get("client_id")
+	secret := r.Header.Get("client_secret")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, client_id, client_secret")
+
+	if len(collection) == 0 {
+		http.Error(w, "could not find the collection", http.StatusInternalServerError)
+		return
+	}
+	dbClient := persistence.CreateClient(r.Context(), projectId)
+	switch method := r.Method; method {
+	case http.MethodPost:
+		err := doAuth(clientId, secret, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		err = SaveScreening(dbClient, collection, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintf(w, "ok")
+	case http.MethodGet:
+		err := doAuth(clientId, secret, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		fmt.Fprintf(w, "ok")
+	default:
+		fmt.Fprintf(w, "ok")
+	}
 }
