@@ -18,10 +18,11 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 	dateScreened, _ := time.Parse(dateLayout, "2020-05-24")
 	arrivalDate, _ := time.Parse(dateLayout, "2020-05-24")
 	embarkDate, _ := time.Parse(dateLayout, "2020-05-23")
+	modified, _ := time.Parse(dateLayout, "2020-06-21")
 
-	newArrival := domain.NewArrival{
-		Id:                   "2020-05-28#Kla-Sch#21235345212",
-		TravellingCompanions: []string{"2020-05-28#Joh-Bra#212353492"},
+	newArrival := domain.ArrivalRequest{
+		Id:                   "2020-05-28#Fau-Nam#21235345212",
+		TravellingCompanions: []string{"2020-05-28#Ter-Pre#212353492"},
 		ArrivalInfo: &domain.ArrivalInfo{
 			DateOfArrival:        domain.SimpleTime{arrivalDate},
 			ModeOfTravel:         "Air",
@@ -31,9 +32,9 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 			PortOfEntry:          "pgia",
 		},
 		PersonalInfo: domain.PersonalInfo{
-			FirstName:         "Klara",
-			MiddleNameInitial: "U",
-			LastName:          "Schuman",
+			FirstName:         "Faust",
+			MiddleNameInitial: "B",
+			LastName:          "Namsh",
 			PassportNumber:    "21235345212",
 			Dob:               domain.SimpleTime{dob},
 			Nationality:       "Belizean",
@@ -45,6 +46,7 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 		},
 		Screening: []domain.Screening{
 			{
+				Id: "981231323ccadf",
 				FluLikeSymptoms: domain.FluLikeSymptoms{
 					Fever:            false,
 					Headache:         false,
@@ -63,11 +65,13 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 				DateScreened:              domain.SimpleTime{dateScreened},
 			},
 		},
+		Modified: domain.SimpleTime{modified},
 	}
 
-	companion := domain.NewArrival{
-		Id:                   "2020-05-28#Joh-Bra#212353492",
-		TravellingCompanions: []string{"2020-05-28#Kla-Sch#21235345212"},
+	companion := domain.ArrivalRequest{
+		Id:                   "2020-05-28#Ter-Per#212353492",
+		Modified:             domain.SimpleTime{modified},
+		TravellingCompanions: []string{"2020-05-28#Fau-Nam#21235345212"},
 		ArrivalInfo: &domain.ArrivalInfo{
 			DateOfArrival:        domain.SimpleTime{arrivalDate},
 			ModeOfTravel:         "Air",
@@ -77,8 +81,8 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 			PortOfEntry:          "pgia",
 		},
 		PersonalInfo: domain.PersonalInfo{
-			FirstName:      "Johannes",
-			LastName:       "Brham",
+			FirstName:      "Terry",
+			LastName:       "Periwinkle",
 			PassportNumber: "212353492",
 			Dob:            domain.SimpleTime{dob},
 			Nationality:    "Belizean",
@@ -90,6 +94,7 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 		},
 		Screening: []domain.Screening{
 			{
+				Id: "981231323ccadf",
 				FluLikeSymptoms: domain.FluLikeSymptoms{
 					Fever:            false,
 					Headache:         false,
@@ -110,7 +115,7 @@ func TestFirestoreClient_UpsertArrival(t *testing.T) {
 		},
 	}
 
-	arrivals := domain.HydrateCompanions([]domain.NewArrival{newArrival, companion})
+	arrivals := domain.HydrateCompanions([]domain.ArrivalRequest{newArrival, companion})
 	err := client.UpsertArrival("port-of-entry-screening", arrivals)
 
 	if err != nil {

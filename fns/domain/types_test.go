@@ -14,7 +14,7 @@ func TestHydrateCompanions(t *testing.T) {
 	arrivalDate, _ := time.Parse(dateLayout, "2020-05-24")
 	embarkDate, _ := time.Parse(dateLayout, "2020-05-23")
 
-	newArrival := domain.NewArrival{
+	newArrival := domain.ArrivalRequest{
 		Id:                   "2020-05-28#Kla-Sch#21235345212",
 		TravellingCompanions: []string{"2020-05-28#Joh-Bra#212353492"},
 		ArrivalInfo: &domain.ArrivalInfo{
@@ -60,7 +60,7 @@ func TestHydrateCompanions(t *testing.T) {
 		},
 	}
 
-	companion := domain.NewArrival{
+	companion := domain.ArrivalRequest{
 		Id:                   "2020-05-28#Joh-Bra#212353492",
 		TravellingCompanions: []string{"2020-05-28#Kla-Sch#21235345212"},
 		ArrivalInfo: &domain.ArrivalInfo{
@@ -105,7 +105,7 @@ func TestHydrateCompanions(t *testing.T) {
 		},
 	}
 
-	arrivals := domain.HydrateCompanions([]domain.NewArrival{newArrival, companion})
+	arrivals := domain.HydrateCompanions([]domain.ArrivalRequest{newArrival, companion})
 
 	first := arrivals[0]
 	second := arrivals[1]

@@ -6,6 +6,20 @@ import (
 	"time"
 )
 
+type ArrivalSyncStatus int
+
+const (
+	NEW_ARRIVAL ArrivalSyncStatus = iota
+	SYNCED_ARRIVAL
+)
+
+type ScreeningSyncStatus int
+
+const (
+	NEW_SCREENING ScreeningSyncStatus = iota
+	SYNCED_SCREENING
+)
+
 type SimpleTime struct {
 	time.Time
 }
@@ -63,6 +77,7 @@ type FluLikeSymptoms struct {
 }
 
 type Screening struct {
+	Id                        string          `json:"id"`
 	FluLikeSymptoms           FluLikeSymptoms `json:"flu_like_symptoms"`
 	OtherSymptoms             string          `json:"other_symptoms"`
 	DiagnosedWithCovid19      bool            `json:"diagnosed_with_covid19"`
@@ -72,6 +87,18 @@ type Screening struct {
 	DateScreened              SimpleTime      `json:"date_screened"`
 }
 
+type ScreeningRequest struct {
+	Id                        string              `json:"id"`
+	FluLikeSymptoms           FluLikeSymptoms     `json:"flu_like_symptoms"`
+	OtherSymptoms             string              `json:"other_symptoms"`
+	DiagnosedWithCovid19      bool                `json:"diagnosed_with_covid19"`
+	ContactWithHealthFacility bool                `json:"contact_with_health_facility"`
+	Comments                  string              `json:"comments, omitempty"`
+	Location                  string              `json:"location"`
+	DateScreened              SimpleTime          `json:"date_screened"`
+	SyncStatus                ScreeningSyncStatus `json:"syncStatus"`
+}
+
 type Arrival struct {
 	Id                   string           `json:"id"`
 	ArrivalInfo          *ArrivalInfo     `json:"arrival_info, omitempty"`
@@ -79,18 +106,21 @@ type Arrival struct {
 	AddressInBelize      *AddressInBelize `json:"address_in_belize, omitempty"`
 	Screening            []Screening      `json:"screening"`
 	TravellingCompanions []PersonalInfo   `json:"travelling_companions, omitempty"`
+	Modified             SimpleTime       `json:"modified"`
 }
 
-type NewArrival struct {
-	Id                   string           `json:"id"`
-	ArrivalInfo          *ArrivalInfo     `json:"arrival_info, omitempty"`
-	PersonalInfo         PersonalInfo     `json:"personal_info"`
-	AddressInBelize      *AddressInBelize `json:"address_in_Belize, omitempty"`
-	Screening            []Screening      `json:"screening"`
-	TravellingCompanions []string         `json:"travelling_companions, omitempty"`
+type ArrivalRequest struct {
+	Id                   string            `json:"id"`
+	ArrivalInfo          *ArrivalInfo      `json:"arrival_info, omitempty"`
+	PersonalInfo         PersonalInfo      `json:"personal_info"`
+	AddressInBelize      *AddressInBelize  `json:"address_in_Belize, omitempty"`
+	Screening            []Screening       `json:"screening"`
+	TravellingCompanions []string          `json:"travelling_companions, omitempty"`
+	Modified             SimpleTime        `json:"modified"`
+	SyncStatus           ArrivalSyncStatus `json:"syncStatus"`
 }
 
-func Index(vs []string, t NewArrival) int {
+func Index(vs []string, t ArrivalRequest) int {
 	for i, v := range vs {
 		if v == t.Id {
 			return i
@@ -99,12 +129,12 @@ func Index(vs []string, t NewArrival) int {
 	return -1
 }
 
-func Include(vs []string, t NewArrival) bool {
+func Include(vs []string, t ArrivalRequest) bool {
 	return Index(vs, t) >= 0
 }
 
-func Filter(vs []NewArrival, f func(NewArrival) bool) []NewArrival {
-	vsf := make([]NewArrival, 0)
+func Filter(vs []ArrivalRequest, f func(ArrivalRequest) bool) []ArrivalRequest {
+	vsf := make([]ArrivalRequest, 0)
 	for _, v := range vs {
 		if f(v) {
 			vsf = append(vsf, v)
@@ -113,7 +143,7 @@ func Filter(vs []NewArrival, f func(NewArrival) bool) []NewArrival {
 	return vsf
 }
 
-func Map(vs []NewArrival, f func(arrival NewArrival) PersonalInfo) []PersonalInfo {
+func Map(vs []ArrivalRequest, f func(arrival ArrivalRequest) PersonalInfo) []PersonalInfo {
 	vsm := make([]PersonalInfo, len(vs))
 	for i, v := range vs {
 		vsm[i] = f(v)
@@ -123,13 +153,13 @@ func Map(vs []NewArrival, f func(arrival NewArrival) PersonalInfo) []PersonalInf
 
 // MapToPersonalInfo retrieves the PersonalInfo from an array of NewArrivals for the
 // corresponding Id.
-func MapToPersonalInfo(arrival NewArrival, info []NewArrival) []PersonalInfo {
+func MapToPersonalInfo(arrival ArrivalRequest, info []ArrivalRequest) []PersonalInfo {
 
-	arrivals := Filter(info, func(arr NewArrival) bool {
+	arrivals := Filter(info, func(arr ArrivalRequest) bool {
 		return arrival.Id != arr.Id && Include(arrival.TravellingCompanions, arr)
 	})
 
-	return Map(arrivals, func(arrival NewArrival) PersonalInfo {
+	return Map(arrivals, func(arrival ArrivalRequest) PersonalInfo {
 		arrival.PersonalInfo.Id = arrival.Id
 		arrival.PersonalInfo.FullName = fmt.Sprintf("%s %s", arrival.PersonalInfo.FirstName, arrival.PersonalInfo.LastName)
 		return arrival.PersonalInfo
@@ -141,7 +171,7 @@ func MapToPersonalInfo(arrival NewArrival, info []NewArrival) []PersonalInfo {
 // and hydrates their travelling companions with the
 // matching PersonalInfo. It returns an array of Arrival
 // with the enriched TravellingCompanions.
-func HydrateCompanions(arrs []NewArrival) []Arrival {
+func HydrateCompanions(arrs []ArrivalRequest) []Arrival {
 	arrivals := make([]Arrival, 0)
 	for _, v := range arrs {
 		infos := MapToPersonalInfo(v, arrs)
@@ -152,6 +182,7 @@ func HydrateCompanions(arrs []NewArrival) []Arrival {
 			PersonalInfo:         v.PersonalInfo,
 			AddressInBelize:      v.AddressInBelize,
 			Screening:            v.Screening,
+			Modified:             v.Modified,
 			TravellingCompanions: infos,
 		}
 		arrivals = append(arrivals, arrival)

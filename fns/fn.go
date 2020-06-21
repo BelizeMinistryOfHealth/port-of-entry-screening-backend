@@ -128,37 +128,6 @@ func ListArrivals(dbClient *persistence.FirestoreClient, collection string, r *h
 	return arrivals, nil
 }
 
-func UpsertArrival(dbClient *persistence.FirestoreClient, collection string, r *http.Request) ([]domain.Arrival, error) {
-	var newArrivals []domain.NewArrival
-
-	// Read body
-	body := r.Body
-	b, err := ioutil.ReadAll(body)
-	defer body.Close()
-	if err != nil {
-		return nil, fmt.Errorf("could not parse the body posted: %v", err)
-	}
-
-	err = json.Unmarshal(b, &newArrivals)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"body":  string(b),
-			"error": err,
-		}).Error("could not unmarshall the body posted")
-		return nil, fmt.Errorf("could not unmarshall the body posted: %v", err)
-	}
-
-	arrivals := domain.HydrateCompanions(newArrivals)
-
-	err = dbClient.UpsertArrival(collection, arrivals)
-	if err != nil {
-		return nil, fmt.Errorf("error saving newArrivals information: %v", err)
-	}
-
-	return arrivals, nil
-
-}
-
 func FindByPortOfEntry(w http.ResponseWriter, r *http.Request) {
 	projectId := os.Getenv("PROJECT_ID")
 	collection := os.Getenv("DB_COLLECTION")
