@@ -23,6 +23,9 @@ func UpsertArrival(dbClient *persistence.FirestoreClient, collection string, r *
 		return nil, fmt.Errorf("could not parse the body posted: %v", err)
 	}
 
+	logrus.WithFields(logrus.Fields{
+		"body": string(b),
+	}).Info("Got Upsert request for arrivals")
 	err = json.Unmarshal(b, &newArrivals)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
