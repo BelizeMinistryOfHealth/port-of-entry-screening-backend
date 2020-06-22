@@ -96,7 +96,7 @@ type ScreeningRequest struct {
 	Comments                  string              `json:"comments, omitempty"`
 	Location                  string              `json:"location"`
 	DateScreened              SimpleTime          `json:"date_screened"`
-	SyncStatus                ScreeningSyncStatus `json:"syncStatus"`
+	SyncStatus                ScreeningSyncStatus `json:"sync_status"`
 }
 
 type Arrival struct {
@@ -117,7 +117,7 @@ type ArrivalRequest struct {
 	Screening            []Screening       `json:"screening"`
 	TravellingCompanions []string          `json:"travelling_companions, omitempty"`
 	Modified             SimpleTime        `json:"modified"`
-	SyncStatus           ArrivalSyncStatus `json:"syncStatus"`
+	SyncStatus           ArrivalSyncStatus `json:"sync_status"`
 }
 
 func Index(vs []string, t ArrivalRequest) int {
