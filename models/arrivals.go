@@ -4,11 +4,11 @@ import "time"
 
 // AddressInBelize is the address that the person is residing within Belize
 type AddressInBelize struct {
-	Address           Address `json:"address" firestore:"address"`
-	ControlID         string  `json:"controlId" firestore:"controlId"`
-	AccommodationName string  `json:"accommodationName" firestore:"accommodationName"`
-	StartDate         string  `json:"startDate" firestore:"startDate"`
-	EndDate           string  `json:"endDate" firestore:"endDate"`
+	Address           Address    `json:"address" firestore:"address"`
+	ControlID         string     `json:"controlId" firestore:"controlId"`
+	AccommodationName string     `json:"accommodationName" firestore:"accommodationName"`
+	StartDate         time.Time  `json:"startDate" firestore:"startDate"`
+	EndDate           *time.Time `json:"endDate" firestore:"endDate"`
 }
 
 // Community represents a community in a district within Belize
@@ -27,14 +27,14 @@ type Address struct {
 // ArrivalInfo contains information specific to an arrival, including port of embarkation and
 // vessel information
 type ArrivalInfo struct {
-	DateOfArrival        string `json:"dateOfArrival" firestore:"dateOfArrival"`
-	ModeOfTravel         string `json:"modeOfTravel" firestore:"modeOfTravel"`
-	VesselNumber         string `json:"vesselNumber" firestore:"vesselNumber"`
-	CountryOfEmbarkation string `json:"countryOfEmbarkation" firestore:"countryOfEmbarkation"`
-	DateOfEmbarkation    string `json:"dateOfEmbarkation" firestore:"dateOfEmbarkation"`
-	PortOfEntry          string `json:"portOfEntry" firestore:"portOfEntry"`
-	TravelOrigin         string `json:"travelOrigin" firestore:"travelOrigin"`
-	CountriesVisited     string `json:"countriesVisited" firestore:"countriesVisited"`
+	DateOfArrival        time.Time `json:"dateOfArrival" firestore:"dateOfArrival"`
+	ModeOfTravel         string    `json:"modeOfTravel" firestore:"modeOfTravel"`
+	VesselNumber         string    `json:"vesselNumber" firestore:"vesselNumber"`
+	CountryOfEmbarkation string    `json:"countryOfEmbarkation" firestore:"countryOfEmbarkation"`
+	DateOfEmbarkation    string    `json:"dateOfEmbarkation" firestore:"dateOfEmbarkation"`
+	PortOfEntry          string    `json:"portOfEntry" firestore:"portOfEntry"`
+	TravelOrigin         string    `json:"travelOrigin" firestore:"travelOrigin"`
+	CountriesVisited     string    `json:"countriesVisited" firestore:"countriesVisited"`
 }
 
 /// Screening Structs
@@ -80,7 +80,7 @@ type Screening struct {
 	ContactWithHealthFacility bool            `json:"contactWithHealthFacility" firestore:"contactWithHealthFacility"`
 	Comments                  string          `json:"comments" firestore:"comments"`
 	Location                  string          `json:"location" firestore:"location"`
-	DateScreened              string          `json:"dateScreened" firestore:"dateScreened"`
+	DateScreened              time.Time       `json:"dateScreened" firestore:"dateScreened"`
 	Temperature               float32         `json:"temperature" firestore:"temperature"`
 	FluLikeSymptoms           FluLikeSymptoms `json:"fluLikeSymptoms" firestore:"fluLikeSymptoms"`
 	CreatedBy                 Editor          `json:"createdBy"`
@@ -125,8 +125,8 @@ type Arrival struct {
 	ContactPersonPhoneNumber string                `json:"contactPersonPhoneNumber,omitempty" firestore:"contactPersonPhoneNumber"`
 	PurposeOfTrip            string                `json:"purposeOfTrip" firestore:"purposeOfTrip"`
 	LengthStay               string                `json:"lengthStay" firestore:"lengthStay"`
-	Created                  string                `json:"created" firestore:"created"`
-	Modified                 string                `json:"modified,omitempty" firestore:"modified"`
+	Created                  time.Time             `json:"created" firestore:"created"`
+	Modified                 *time.Time            `json:"modified,omitempty" firestore:"modified"`
 }
 
 // Person contains personal information and arrival information for a person.
@@ -136,8 +136,8 @@ type Person struct {
 	PersonalInfo       PersonalInfo `json:"personalInfo" firestore:"personalInfo"`
 	Arrival            Arrival      `json:"arrivals" firestore:"arrivals"`
 	Covid19Vaccination Vaccination  `json:"covid19Vaccination" firestore:"covid19Vaccination"`
-	Created            string       `json:"created" firestore:"created"`
-	Modified           string       `json:"modified,omitempty" firestore:"modified"`
+	Created            time.Time    `json:"created" firestore:"created"`
+	Modified           *time.Time   `json:"modified,omitempty" firestore:"modified"`
 	PortOfEntry        string       `json:"portOfEntry" firestore:"portOfEntry"`
 }
 
@@ -155,7 +155,7 @@ type Vaccination struct {
 }
 
 // WasScreenedOnDate indicates if a person was screened on a specific date.
-func (p *Person) WasScreenedOnDate(date string) bool {
+func (p *Person) WasScreenedOnDate(date time.Time) bool {
 	screenings := p.Arrival.Screenings
 	for _, s := range screenings {
 		if s.DateScreened == date {
