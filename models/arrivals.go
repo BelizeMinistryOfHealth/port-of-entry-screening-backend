@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // AddressInBelize is the address that the person is residing within Belize
 type AddressInBelize struct {
 	Address           Address `json:"address" firestore:"address"`
@@ -129,13 +131,27 @@ type Arrival struct {
 
 // Person contains personal information and arrival information for a person.
 type Person struct {
-	ID           string       `json:"id" firestore:"id"`
-	ObjectID     string       `json:"objectID" firestore:"objectID"`
-	PersonalInfo PersonalInfo `json:"personalInfo" firestore:"personalInfo"`
-	Arrival      Arrival      `json:"arrivals" firestore:"arrivals"`
-	Created      string       `json:"created" firestore:"created"`
-	Modified     string       `json:"modified,omitempty" firestore:"modified"`
-	PortOfEntry  string       `json:"portOfEntry" firestore:"portOfEntry"`
+	ID                 string       `json:"id" firestore:"id"`
+	ObjectID           string       `json:"objectID" firestore:"objectID"`
+	PersonalInfo       PersonalInfo `json:"personalInfo" firestore:"personalInfo"`
+	Arrival            Arrival      `json:"arrivals" firestore:"arrivals"`
+	Covid19Vaccination Vaccination  `json:"covid19Vaccination" firestore:"covid19Vaccination"`
+	Created            string       `json:"created" firestore:"created"`
+	Modified           string       `json:"modified,omitempty" firestore:"modified"`
+	PortOfEntry        string       `json:"portOfEntry" firestore:"portOfEntry"`
+}
+
+// Vaccine indicates how many shots are required for a vaccine
+type Vaccine struct {
+	Name          string `json:"name" firestore:"name"`
+	NumberOfShots int    `json:"numberOfShots" firestore:"numberOfShots"`
+}
+
+// Vaccination indicates what vaccine a person received and the number of shots
+type Vaccination struct {
+	Vaccine              Vaccine   `json:"vaccine" firestore:"vaccine"`
+	NumberOfShots        int       `json:"numberOfShots" firestore:"numberOfShots"`
+	DateOfMostRecentShot time.Time `json:"dateOfMostRecentShot" firestore:"dateOfMostRecentShot"`
 }
 
 // WasScreenedOnDate indicates if a person was screened on a specific date.
