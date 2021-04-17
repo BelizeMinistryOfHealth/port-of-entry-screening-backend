@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // FirestoreAddresses is how the addresses are encoded in a Firestore event
 type FirestoreAddresses struct {
 	ArrayValue struct {
@@ -302,4 +304,24 @@ type ArrivalFirestoreFields struct {
 	ObjectID struct {
 		StringValue string `json:"stringValue"`
 	} `json:"objectID"`
+}
+
+// FirestoreEvent is the payload of a Firestore event.
+type FirestoreArrivalEvent struct {
+	OldValue   FirestoreArrivalValue `json:"oldValue"`
+	Value      FirestoreArrivalValue `json:"value"`
+	UpdateMask struct {
+		FieldPaths []string `json:"fieldPaths"`
+	} `json:"updateMask"`
+}
+
+// FirestoreValue holds Firestore fields.
+type FirestoreArrivalValue struct {
+	CreateTime time.Time `json:"createTime"`
+	// Fields is the data for this value. The type depends on the format of your
+	// database. Log an interface{} value and inspect the result to see a JSON
+	// representation of your database fields.
+	Fields     ArrivalFirestoreFields `json:"fields"`
+	Name       string                 `json:"name"`
+	UpdateTime time.Time              `json:"updateTime"`
 }
