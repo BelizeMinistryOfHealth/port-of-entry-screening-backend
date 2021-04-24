@@ -306,7 +306,7 @@ type ArrivalFirestoreFields struct {
 	} `json:"objectID"`
 }
 
-// FirestoreEvent is the payload of a Firestore event.
+// FirestoreArrivalEvent is the payload of a Firestore event.
 type FirestoreArrivalEvent struct {
 	OldValue   FirestoreArrivalValue `json:"oldValue"`
 	Value      FirestoreArrivalValue `json:"value"`
@@ -315,7 +315,7 @@ type FirestoreArrivalEvent struct {
 	} `json:"updateMask"`
 }
 
-// FirestoreValue holds Firestore fields.
+// FirestoreArrivalValue holds Firestore fields.
 type FirestoreArrivalValue struct {
 	CreateTime time.Time `json:"createTime"`
 	// Fields is the data for this value. The type depends on the format of your
