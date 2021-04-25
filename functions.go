@@ -39,7 +39,11 @@ func HelloPubSub(ctx context.Context, m PubSubMessage) error {
 	//	name = "World"
 	//}
 	var person models.Person
-	json.Decode(ctx, m.Data, &person)
+	if err := json.Decode(ctx, m.Data, &person); err != nil {
+		log.Printf("Error decoding person: %v", err)
+		return nil
+	}
+
 	log.Printf("Hello, %v!", person)
 	return nil
 }
