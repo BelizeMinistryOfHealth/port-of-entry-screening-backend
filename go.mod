@@ -3,7 +3,9 @@ module bz.moh.epi/poebackend
 go 1.16
 
 require (
+	cloud.google.com/go/firestore v1.5.0
 	cloud.google.com/go/pubsub v1.10.2
+	firebase.google.com/go/v4 v4.5.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.2.0
 	github.com/cloudevents/sdk-go/v2 v2.2.0
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect

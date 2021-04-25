@@ -1,4 +1,4 @@
-package repository
+package firesearch
 
 import (
 	"bz.moh.epi/poebackend/models"
@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-// FiresearchService is an instance of a service that allows us to do operations on Firesearch.
-type FiresearchService struct {
+// Service is an instance of a service that allows us to do operations on Firesearch.
+type Service struct {
 	IndexName    string
 	IndexPath    string
 	PortOfEntry  string
@@ -17,8 +17,8 @@ type FiresearchService struct {
 	Client       *firesearch.Client
 }
 
-// CreateFiresearchService creates an instance of the FiresearchService
-func CreateFiresearchService(indexName, indexPath, portOfEntry string) FiresearchService {
+// CreateFiresearchService creates an instance of the Service
+func CreateFiresearchService(indexName, indexPath, portOfEntry string) Service {
 	host := os.Getenv("FIRESEARCH_HOST")
 	api := os.Getenv("FIRESEARCH_API_KEY")
 	client := firesearch.NewClient(
@@ -26,7 +26,7 @@ func CreateFiresearchService(indexName, indexPath, portOfEntry string) Firesearc
 		api,
 	)
 	indexService := firesearch.NewIndexService(client)
-	return FiresearchService{
+	return Service{
 		IndexName:    indexName,
 		IndexPath:    fmt.Sprintf("firesearch/indexes/%s", indexPath),
 		PortOfEntry:  portOfEntry,
@@ -36,7 +36,7 @@ func CreateFiresearchService(indexName, indexPath, portOfEntry string) Firesearc
 }
 
 // CreateIndex creates an index in Firesearch
-func (f FiresearchService) CreateIndex(ctx context.Context) error {
+func (f Service) CreateIndex(ctx context.Context) error {
 	createIndexReq := firesearch.CreateIndexRequest{
 		Index: firesearch.Index{
 			IndexPath:     f.IndexPath,
@@ -55,7 +55,7 @@ func (f FiresearchService) CreateIndex(ctx context.Context) error {
 }
 
 // PutDoc creates a document in the Firesearch index
-func (f FiresearchService) PutDoc(ctx context.Context, person models.Person) error {
+func (f Service) PutDoc(ctx context.Context, person models.Person) error {
 	personalInfo := person.PersonalInfo
 	putDocReq := firesearch.PutDocRequest{
 		IndexPath: f.IndexPath,
@@ -118,7 +118,7 @@ func (f FiresearchService) PutDoc(ctx context.Context, person models.Person) err
 }
 
 // SearchDocs searches for a document that has the specified searchText
-func (f FiresearchService) SearchDocs(ctx context.Context, accessKey, searchText string) ([]firesearch.SearchResult, error) {
+func (f Service) SearchDocs(ctx context.Context, accessKey, searchText string) ([]firesearch.SearchResult, error) {
 	searchReq := firesearch.SearchRequest{
 		Query: firesearch.SearchQuery{
 			IndexPath: f.IndexPath,

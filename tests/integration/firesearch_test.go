@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"bz.moh.epi/poebackend/repository"
+	firesearch2 "bz.moh.epi/poebackend/repository/firesearch"
 	"context"
 	"github.com/pacedotdev/firesearch-sdk/clients/go/firesearch"
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func TestCreateIndex(t *testing.T) {
 	ctx := context.Background()
-	firesearchService := repository.CreateFiresearchService(
+	firesearchService := firesearch2.CreateFiresearchService(
 		"Test Index",
 		"test_index",
 		"PGIA")
@@ -27,7 +27,7 @@ func TestPutDoc(t *testing.T) {
 	//	api,
 	//)
 	//indexService := firesearch.NewIndexService(client)
-	firesearchService := repository.CreateFiresearchService(
+	firesearchService := firesearch2.CreateFiresearchService(
 		"Test Index",
 		"test_index",
 		"PGIA")
