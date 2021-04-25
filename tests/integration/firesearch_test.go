@@ -1,4 +1,4 @@
-package tests
+package integration
 
 import (
 	"bz.moh.epi/poebackend/repository"
