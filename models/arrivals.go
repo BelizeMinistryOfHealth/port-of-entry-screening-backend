@@ -117,10 +117,10 @@ type TravellingCompanion struct {
 type Arrival struct {
 	TripID                   string                `json:"tripId" firestore:"tripId"`
 	ArrivalInfo              ArrivalInfo           `json:"arrivalInfo" firestore:"arrivalInfo"`
-	Addresses                []AddressInBelize     `json:"addresses" firestore:"addresses"`
+	HotelAddress             AddressInBelize       `json:"hotelAddress" firestore:"hotelAddress"`
+	Address                  AddressInBelize       `json:"address" firestore:"address"`
 	Screenings               []Screening           `json:"screenings" firestore:"screenings"`
 	TravellingCompanions     []TravellingCompanion `json:"travellingCompanions" firestore:"travellingCompanions"`
-	QuarantineLocation       string                `json:"quarantineLocation" firestore:"quarantineLocation"`
 	ContactPerson            string                `json:"contactPerson,omitempty" firestore:"contactPerson"`
 	ContactPersonPhoneNumber string                `json:"contactPersonPhoneNumber,omitempty" firestore:"contactPersonPhoneNumber"`
 	PurposeOfTrip            string                `json:"purposeOfTrip" firestore:"purposeOfTrip"`
