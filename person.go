@@ -3,6 +3,7 @@ package poebackend
 import (
 	"bz.moh.epi/poebackend/models"
 	"context"
+	"time"
 )
 
 // PersonStoreService represents a service for managing persons entering through a port of entry.
@@ -24,4 +25,7 @@ type SearchService interface {
 	// SearchPerson conducts a full text search for a person. The txt could match the full name,
 	// or any part of the name, as well as their QR code, etc.
 	SearchPerson(ctx context.Context, txt string) ([]models.Person, error)
+
+	// SearchByDate lists persons who will arrive on the given date
+	SearchByDate(ctx context.Context, date time.Time) ([]models.Person, error)
 }

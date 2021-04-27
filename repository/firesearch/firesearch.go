@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/pacedotdev/firesearch-sdk/clients/go/firesearch"
 	"os"
+	"time"
 )
 
 // Service is an instance of a service that allows us to do operations on Firesearch.
@@ -57,6 +58,10 @@ func (f Service) CreateIndex(ctx context.Context) error {
 // PutDoc creates a document in the Firesearch index
 func (f Service) PutDoc(ctx context.Context, person models.Person) error {
 	personalInfo := person.PersonalInfo
+	dateOfArrival := person.Arrival.ArrivalInfo.DateOfArrival
+	yearOfArrival := dateOfArrival.Year()
+	monthOfArrival := dateOfArrival.Month()
+	dayOfArrival := dateOfArrival.Day()
 	putDocReq := firesearch.PutDocRequest{
 		IndexPath: f.IndexPath,
 		Doc: firesearch.Doc{
@@ -92,6 +97,21 @@ func (f Service) PutDoc(ctx context.Context, person models.Person) error {
 					Value: person.Arrival.ArrivalInfo.DateOfArrival.Format("2006-01-02"),
 					Store: true,
 				},
+				{
+					Key:   "yearOfArrival",
+					Value: fmt.Sprintf("%d", yearOfArrival),
+					Store: true,
+				},
+				{
+					Key:   "monthOfArrival",
+					Value: fmt.Sprintf("%d", monthOfArrival),
+					Store: true,
+				},
+				{
+					Key:   "dayOfArrival",
+					Value: fmt.Sprintf("%d", dayOfArrival),
+					Store: true,
+				},
 			},
 			Fields: []firesearch.Field{
 				{
@@ -119,18 +139,69 @@ func (f Service) PutDoc(ctx context.Context, person models.Person) error {
 
 // SearchDocs searches for a document that has the specified searchText
 func (f Service) SearchDocs(ctx context.Context, accessKey, searchText string) ([]firesearch.SearchResult, error) {
+	filters := []firesearch.Field{
+		{
+			Key:   "portOfEntry",
+			Value: f.PortOfEntry,
+		},
+		{
+			Key:   "yearOfArrival",
+			Value: "2021",
+		},
+		{
+			Key:   "monthOfArrival",
+			Value: "5",
+		},
+	}
 	searchReq := firesearch.SearchRequest{
 		Query: firesearch.SearchQuery{
 			IndexPath: f.IndexPath,
 			AccessKey: accessKey,
 			Limit:     50,
 			Text:      searchText,
-			Filters: []firesearch.Field{
-				{
-					Key:   "portOfEntry",
-					Value: f.PortOfEntry,
-				},
+			Filters:   filters,
+			Select: []string{
+				"ID",
+				"personalInfo",
+				"arrivalInfo",
+				"tripID",
+				"portOfEntry",
+				"dateOfArrival",
 			},
+			SearchFields: []string{},
+		},
+	}
+	searchResp, err := f.IndexService.Search(ctx, searchReq)
+	if err != nil {
+		return []firesearch.SearchResult{}, fmt.Errorf("firesearch: Search failed: %w", err)
+	}
+
+	return searchResp.Hits, nil
+}
+
+// SearchByDate searches for a document that has the specified searchText
+func (f Service) SearchByDate(ctx context.Context, date time.Time, accessKey, searchText string) ([]firesearch.SearchResult, error) {
+	filters := []firesearch.Field{
+		{
+			Key:   "portOfEntry",
+			Value: f.PortOfEntry,
+		},
+		{
+			Key:   "yearOfArrival",
+			Value: fmt.Sprintf("%d", date.Year()),
+		},
+		{
+			Key:   "monthOfArrival",
+			Value: fmt.Sprintf("%d", date.Month()),
+		},
+	}
+	searchReq := firesearch.SearchRequest{
+		Query: firesearch.SearchQuery{
+			IndexPath: f.IndexPath,
+			AccessKey: accessKey,
+			Limit:     50,
+			Text:      searchText,
+			Filters:   filters,
 			Select: []string{
 				"ID",
 				"personalInfo",
