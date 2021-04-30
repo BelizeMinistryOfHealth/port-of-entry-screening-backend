@@ -220,3 +220,13 @@ func (f Service) SearchByDate(ctx context.Context, date time.Time, accessKey, se
 
 	return searchResp.Hits, nil
 }
+
+// CreatePerson inserts a person into firesearch
+func (f Service) CreatePerson(ctx context.Context, person models.Person) error {
+	return f.PutDoc(ctx, person)
+}
+
+// UpdatePerson updates a person in firesearch
+func (f Service) UpdatePerson(ctx context.Context, person models.Person) error {
+	return f.PutDoc(ctx, person)
+}

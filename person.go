@@ -22,10 +22,6 @@ type PersonStoreService interface {
 
 // SearchService represents a service that performs full text search.
 type SearchService interface {
-	// SearchPerson conducts a full text search for a person. The txt could match the full name,
-	// or any part of the name, as well as their QR code, etc.
-	SearchPerson(ctx context.Context, txt string) ([]models.Person, error)
-
 	// SearchByDate lists persons who will arrive on the given date
 	SearchByDate(ctx context.Context, date time.Time) ([]models.Person, error)
 }
