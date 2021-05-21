@@ -5,6 +5,7 @@ import (
 	"bz.moh.epi/poebackend/models"
 	"bz.moh.epi/poebackend/repository/firesearch"
 	"context"
+	"fmt"
 	"github.com/cloudevents/sdk-go/v2/event/datacodec/json"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -66,6 +67,22 @@ func PersonsHook(ctx context.Context, event models.FirestorePersonEvent) error {
 		"result":  result,
 		"context": ctx,
 	}).Info("created person event")
+	return nil
+}
+
+func PersonDeletedListener(ctx context.Context, event models.FirestorePersonEvent) error {
+	personStore := firesearch.PersonStore{
+		Service: personFiresearchService,
+	}
+	personID := event.OldValue.Fields.ID.StringValue
+	if err := handlers.PersonDeleted(ctx, personStore, personID); err != nil {
+		log.WithFields(log.Fields{
+			"event":    event,
+			"personID": personID,
+		}).Error(err)
+
+		return fmt.Errorf("PersonDeletedListener failed: %w", err)
+	}
 	return nil
 }
 

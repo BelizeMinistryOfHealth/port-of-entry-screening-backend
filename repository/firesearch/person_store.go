@@ -83,3 +83,17 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 	}
 	return nil
 }
+
+// DeletePerson deletes a person's search index.
+// It is triggered when a person is deleted from the `persons` collection.
+func (c *PersonStore) DeletePerson(ctx context.Context, ID string) error {
+	deleteDocReq := firesearch.DeleteDocRequest{
+		IndexPath: c.Service.IndexPath,
+		ID:        ID,
+	}
+	_, err := c.Service.IndexService.DeleteDoc(ctx, deleteDocReq)
+	if err != nil {
+		return fmt.Errorf("DeletePerson() failed: %w", err)
+	}
+	return nil
+}
