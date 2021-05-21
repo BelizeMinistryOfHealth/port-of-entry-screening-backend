@@ -18,7 +18,7 @@ type HotelStore struct {
 func CreateHotelStore(ctx context.Context, projectID string, coll string) (*HotelStore, error) {
 	c, err := firestore.NewClient(ctx, projectID)
 	if err != nil {
-		return nil, fmt.Errorf("failure creating new firebae client: %w", err)
+		return nil, fmt.Errorf("failure creating new firebase client: %w", err)
 	}
 
 	store := &HotelStore{

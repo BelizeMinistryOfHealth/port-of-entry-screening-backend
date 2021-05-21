@@ -1,7 +1,9 @@
 package poebackend
 
 import (
+	"bz.moh.epi/poebackend/handlers"
 	"bz.moh.epi/poebackend/models"
+	"bz.moh.epi/poebackend/repository/firesearch"
 	"context"
 	"github.com/cloudevents/sdk-go/v2/event/datacodec/json"
 	log "github.com/sirupsen/logrus"
@@ -9,7 +11,8 @@ import (
 	"os"
 )
 
-var server Server //nolint:gochecknoglobals
+var server Server                              //nolint:gochecknoglobals
+var personFiresearchService firesearch.Service //nolint:gochecknoglobals
 
 func init() {
 	backendBaseURL := "https://us-east1-epi-belize.cloudfunctions.net"
@@ -18,6 +21,8 @@ func init() {
 	}
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
+
+	personFiresearchService = firesearch.CreateFiresearchService("Persons Index", "persons_index", "NA")
 }
 
 // HandlerEcho is an echo endpoint for testing purposes
@@ -51,9 +56,15 @@ func HelloPubSub(ctx context.Context, m PubSubMessage) error {
 	return nil
 }
 
-func PersonsHook(ctx context.Context, event interface{}) error {
+func PersonsHook(ctx context.Context, event models.FirestorePersonEvent) error {
+	personStore := firesearch.PersonStore{Service: personFiresearchService}
+	result, err := handlers.PersonCreated(ctx, event, personStore)
+	if err != nil {
+		return err
+	}
 	log.WithFields(log.Fields{
-		"event": event,
+		"result":  result,
+		"context": ctx,
 	}).Info("created person event")
 	return nil
 }

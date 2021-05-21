@@ -322,37 +322,82 @@ type TimestampValueStruct struct {
 }
 
 type PersonFirestoreFields struct {
-	Fields struct {
-		FirstName             StringValueStruct `json:"firstName"`
-		MiddleName            StringValueStruct `json:"middleName"`
-		LastName              StringValueStruct `json:"lastName"`
-		Gender                StringValueStruct `json:"gender"`
-		FullName              StringValueStruct `json:"fullName"`
-		Dob                   StringValueStruct `json:"dob"`
-		Nationality           StringValueStruct `json:"nationality"`
-		PhoneNumbers          StringValueStruct `json:"phoneNumbers"`
-		PassportNumber        StringValueStruct `json:"passportNumber"`
-		OtherTravelDocument   StringValueStruct `json:"otherTravelDocument"`
-		OtherTravelDocumentID StringValueStruct `json:"otherTravelDocumentId"`
-		Email                 StringValueStruct `json:"email"`
-		BhisNumber            StringValueStruct `json:"bhisNumber"`
-		CreatedBy             struct {
-			MapValueStruct struct {
-				Fields struct {
-					ID    StringValueStruct `json:"id"`
-					Email StringValueStruct `json:"email"`
-				} `json:"Fields"`
-			} `json:"mapValue"`
-		} `json:"createdBy"`
-		Created    TimestampValueStruct `json:"created"`
-		ModifiedBy struct {
-			MapValueStruct struct {
-				Fields struct {
-					ID    StringValueStruct `json:"id"`
-					Email StringValueStruct `json:"email"`
-				} `json:"fields"`
-			} `json:"mapValue"`
-		} `json:"modifiedBy"`
-		Modified TimestampValueStruct `json:"modified"`
-	} `json:"fields"`
+	ID                    StringValueStruct `json:"id"`
+	FirstName             StringValueStruct `json:"firstName"`
+	MiddleName            StringValueStruct `json:"middleName"`
+	LastName              StringValueStruct `json:"lastName"`
+	Gender                StringValueStruct `json:"gender"`
+	FullName              StringValueStruct `json:"fullName"`
+	Dob                   StringValueStruct `json:"dob"`
+	Nationality           StringValueStruct `json:"nationality"`
+	PhoneNumbers          StringValueStruct `json:"phoneNumbers"`
+	PassportNumber        StringValueStruct `json:"passportNumber"`
+	OtherTravelDocument   StringValueStruct `json:"otherTravelDocument"`
+	OtherTravelDocumentID StringValueStruct `json:"otherTravelDocumentId"`
+	Email                 StringValueStruct `json:"email"`
+	BhisNumber            StringValueStruct `json:"bhisNumber"`
+	Occupation            StringValueStruct `json:"occupation"`
+	CreatedBy             struct {
+		MapValueStruct struct {
+			Fields struct {
+				ID    StringValueStruct `json:"id"`
+				Email StringValueStruct `json:"email"`
+			} `json:"Fields"`
+		} `json:"mapValue"`
+	} `json:"createdBy"`
+	Created    TimestampValueStruct `json:"created"`
+	ModifiedBy struct {
+		MapValueStruct struct {
+			Fields struct {
+				ID    StringValueStruct `json:"id"`
+				Email StringValueStruct `json:"email"`
+			} `json:"fields"`
+		} `json:"mapValue"`
+	} `json:"modifiedBy"`
+	Modified TimestampValueStruct `json:"modified"`
+}
+
+func (p *PersonFirestoreFields) ToPerson() PersonalInfo {
+	return PersonalInfo{
+		ID:                    p.ID.StringValue,
+		FirstName:             p.FirstName.StringValue,
+		LastName:              p.LastName.StringValue,
+		MiddleName:            p.MiddleName.StringValue,
+		FullName:              p.FullName.StringValue,
+		Dob:                   p.Dob.StringValue,
+		Nationality:           p.Nationality.StringValue,
+		PassportNumber:        p.PassportNumber.StringValue,
+		OtherTravelDocument:   p.OtherTravelDocument.StringValue,
+		OtherTravelDocumentID: p.OtherTravelDocumentID.StringValue,
+		Email:                 p.Email.StringValue,
+		Gender:                p.Gender.StringValue,
+		PhoneNumbers:          p.PhoneNumbers.StringValue,
+		BhisNumber:            p.BhisNumber.StringValue,
+		Occupation:            p.Occupation.StringValue,
+		Created:               p.Created.TimestampValue,
+		Modified:              p.Modified.TimestampValue,
+		CreatedBy: Editor{
+			ID:    p.CreatedBy.MapValueStruct.Fields.ID.StringValue,
+			Email: p.CreatedBy.MapValueStruct.Fields.Email.StringValue,
+		},
+		ModifiedBy: Editor{
+			ID:    p.ModifiedBy.MapValueStruct.Fields.ID.StringValue,
+			Email: p.ModifiedBy.MapValueStruct.Fields.Email.StringValue,
+		},
+	}
+}
+
+type FirestorePersonEvent struct {
+	OldValue   FirestorePersonValue `json:"oldValue"`
+	Value      FirestorePersonValue `json:"value"`
+	UpdateMask struct {
+		FieldPaths []string `json:"fieldPaths"`
+	} `json:"updateMask"`
+}
+
+type FirestorePersonValue struct {
+	CreateTime time.Time             `json:"createTime"`
+	Fields     PersonFirestoreFields `json:"fields"`
+	Name       string                `json:"name"`
+	UpdateTime time.Time             `json:"updateTime"`
 }

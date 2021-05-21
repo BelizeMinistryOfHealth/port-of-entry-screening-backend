@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-const event1 = `{"fields": {
+const event1 = `{
                 "gender": {
                     "stringValue": "Male"
                 },
@@ -68,8 +68,7 @@ const event1 = `{"fields": {
                 "fullName": {
                     "stringValue": "Uris Midd Guerra"
                 }
-            }
-}`
+            }`
 
 func Test_MarshalPersonFields(t *testing.T) {
 	ctx := context.Background()
@@ -77,7 +76,7 @@ func Test_MarshalPersonFields(t *testing.T) {
 	if err := json.Decode(ctx, []byte(event1), &fields); err != nil {
 		t.Fatalf("failed to marshal person event: %v", err)
 	}
-	createdBy := fields.Fields.CreatedBy.MapValueStruct.Fields
+	createdBy := fields.CreatedBy.MapValueStruct.Fields
 	if len(createdBy.ID.StringValue) == 0 {
 		t.Errorf("createdBy.ID should not be empty")
 	}
@@ -86,5 +85,5 @@ func Test_MarshalPersonFields(t *testing.T) {
 	}
 	//createdDate :=
 	//t.Logf("created: %v", fields.Fields.Created.TimestampValue.Year())
-	assert.Equal(t, "2021-05-19", fields.Fields.Created.TimestampValue.Format("2006-01-02"))
+	assert.Equal(t, "2021-05-19", fields.Created.TimestampValue.Format("2006-01-02"))
 }

@@ -11,8 +11,8 @@ import (
 func TestCreateIndex(t *testing.T) {
 	ctx := context.Background()
 	firesearchService := firesearch2.CreateFiresearchService(
-		"Test Index",
-		"test_index",
+		"Persons Index",
+		"persons_index",
 		"PGIA")
 	err := firesearchService.CreateIndex(ctx)
 	if err != nil {
@@ -23,8 +23,8 @@ func TestCreateIndex(t *testing.T) {
 func TestPutDoc(t *testing.T) {
 
 	firesearchService := firesearch2.CreateFiresearchService(
-		"Test Index",
-		"test_index",
+		"Persons Index",
+		"persons_index",
 		"PGIA")
 	ctx := context.Background()
 

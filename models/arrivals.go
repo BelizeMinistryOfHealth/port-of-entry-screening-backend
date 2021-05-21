@@ -69,7 +69,7 @@ type FluLikeSymptoms struct {
 // Editor indicates who edited or created a record.
 type Editor struct {
 	Email string `json:"email" firestore:"email"`
-	UID   string `json:"uid" firestore:"uid"`
+	ID    string `json:"id" firestore:"id"`
 }
 
 // Screening is the information collected when screening a person.
@@ -92,26 +92,25 @@ type Screening struct {
 
 // PersonalInfo about a person, mostly demographic in nature.
 type PersonalInfo struct {
-	ID                    string     `json:"id" firestore:"id"`
-	FirstName             string     `json:"firstName" firestore:"firstName"`
-	LastName              string     `json:"lastName" firestore:"lastName"`
-	MiddleName            string     `json:"middleName,omitempty" firestore:"middleName" `
-	FullName              string     `json:"fullName,omitempty" firestore:"fullName" `
-	Dob                   string     `json:"dob" firestore:"dob"`
-	Nationality           string     `json:"nationality" firestore:"nationality"`
-	PassportNumber        string     `json:"passportNumber,omitempty" firestore:"passportNumber"`
-	OtherTravelDocument   string     `json:"otherTravelDocument,omitempty" firestore:"otherTravelDocument"`
-	OtherTravelDocumentID string     `json:"otherTravelDocumentId,omitempty" firestore:"otherTravelDocumentId"`
-	Email                 string     `json:"email,omitempty" firestore:"email"`
-	Gender                string     `json:"gender" firestore:"gender"`
-	PhoneNumbers          string     `json:"phoneNumbers,omitempty" firestore:"phoneNumbers"`
-	BhisNumber            string     `json:"bhisNumber,omitempty" firestore:"bhisNumber"`
-	Occupation            string     `json:"occupation" firestore:"occupation"`
-	PortOfEntry           string     `json:"portOfEntry" firestore:"portOfEntry"`
-	Created               time.Time  `json:"created" firestore:"created"`
-	Modified              *time.Time `json:"modified,omitempty" firestore:"modified"`
-	CreatedBy             string     `json:"createdBy" firestore:"createdBy"`
-	ModifiedBy            string     `json:"modifiedBy" firestore:"modifiedBy"`
+	ID                    string    `json:"id" firestore:"id"`
+	FirstName             string    `json:"firstName" firestore:"firstName"`
+	LastName              string    `json:"lastName" firestore:"lastName"`
+	MiddleName            string    `json:"middleName,omitempty" firestore:"middleName" `
+	FullName              string    `json:"fullName,omitempty" firestore:"fullName" `
+	Dob                   string    `json:"dob" firestore:"dob"`
+	Nationality           string    `json:"nationality" firestore:"nationality"`
+	PassportNumber        string    `json:"passportNumber,omitempty" firestore:"passportNumber"`
+	OtherTravelDocument   string    `json:"otherTravelDocument,omitempty" firestore:"otherTravelDocument"`
+	OtherTravelDocumentID string    `json:"otherTravelDocumentId,omitempty" firestore:"otherTravelDocumentId"`
+	Email                 string    `json:"email,omitempty" firestore:"email"`
+	Gender                string    `json:"gender" firestore:"gender"`
+	PhoneNumbers          string    `json:"phoneNumbers,omitempty" firestore:"phoneNumbers"`
+	BhisNumber            string    `json:"bhisNumber,omitempty" firestore:"bhisNumber"`
+	Occupation            string    `json:"occupation" firestore:"occupation"`
+	Created               time.Time `json:"created" firestore:"created"`
+	Modified              time.Time `json:"modified,omitempty" firestore:"modified"`
+	CreatedBy             Editor    `json:"createdBy" firestore:"createdBy"`
+	ModifiedBy            Editor    `json:"modifiedBy" firestore:"modifiedBy"`
 }
 
 // TravellingCompanion links a person to a companion. These are usually under age persons travelling with an adult.
