@@ -4,8 +4,9 @@ import (
 	"bz.moh.epi/poebackend/models"
 	"context"
 	"github.com/cloudevents/sdk-go/v2/event/datacodec/json"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
+	"os"
 )
 
 var server Server //nolint:gochecknoglobals
@@ -15,6 +16,8 @@ func init() {
 	server = Server{
 		BackendBaseURL: backendBaseURL,
 	}
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
 }
 
 // HandlerEcho is an echo endpoint for testing purposes
@@ -45,6 +48,13 @@ func HelloPubSub(ctx context.Context, m PubSubMessage) error {
 	}
 
 	log.Printf("Hello, %v!", person)
+	return nil
+}
+
+func PersonsHook(ctx context.Context, event interface{}) error {
+	log.WithFields(log.Fields{
+		"event": event,
+	}).Info("created person event")
 	return nil
 }
 

@@ -83,26 +83,35 @@ type Screening struct {
 	DateScreened              time.Time       `json:"dateScreened" firestore:"dateScreened"`
 	Temperature               float32         `json:"temperature" firestore:"temperature"`
 	FluLikeSymptoms           FluLikeSymptoms `json:"fluLikeSymptoms" firestore:"fluLikeSymptoms"`
-	CreatedBy                 Editor          `json:"createdBy"`
 	TookPcrTestInPast72Hours  bool            `json:"tookPcrTestInPast72Hours" firestore:"tookPcrTestInPast72Hours"`
+	Created                   time.Time       `json:"created" firestore:"created"`
+	Modified                  *time.Time      `json:"modified,omitempty" firestore:"modified"`
+	CreatedBy                 string          `json:"createdBy" firestore:"createdBy"`
+	ModifiedBy                string          `json:"modifiedBy" firestore:"modifiedBy"`
 }
 
 // PersonalInfo about a person, mostly demographic in nature.
 type PersonalInfo struct {
-	FirstName             string `json:"firstName" firestore:"firstName"`
-	LastName              string `json:"lastName" firestore:"lastName"`
-	MiddleName            string `json:"middleName,omitempty" firestore:"middleName" `
-	FullName              string `json:"fullName,omitempty" firestore:"fullName" `
-	Dob                   string `json:"dob" firestore:"dob"`
-	Nationality           string `json:"nationality" firestore:"nationality"`
-	PassportNumber        string `json:"passportNumber,omitempty" firestore:"passportNumber"`
-	OtherTravelDocument   string `json:"otherTravelDocument,omitempty" firestore:"otherTravelDocument"`
-	OtherTravelDocumentID string `json:"otherTravelDocumentId,omitempty" firestore:"otherTravelDocumentId"`
-	Email                 string `json:"email,omitempty" firestore:"email"`
-	Gender                string `json:"gender" firestore:"gender"`
-	PhoneNumbers          string `json:"phoneNumbers,omitempty" firestore:"phoneNumbers"`
-	BhisNumber            string `json:"bhisNumber,omitempty" firestore:"bhisNumber"`
-	Occupation            string `json:"occupation" firestore:"occupation"`
+	ID                    string     `json:"id" firestore:"id"`
+	FirstName             string     `json:"firstName" firestore:"firstName"`
+	LastName              string     `json:"lastName" firestore:"lastName"`
+	MiddleName            string     `json:"middleName,omitempty" firestore:"middleName" `
+	FullName              string     `json:"fullName,omitempty" firestore:"fullName" `
+	Dob                   string     `json:"dob" firestore:"dob"`
+	Nationality           string     `json:"nationality" firestore:"nationality"`
+	PassportNumber        string     `json:"passportNumber,omitempty" firestore:"passportNumber"`
+	OtherTravelDocument   string     `json:"otherTravelDocument,omitempty" firestore:"otherTravelDocument"`
+	OtherTravelDocumentID string     `json:"otherTravelDocumentId,omitempty" firestore:"otherTravelDocumentId"`
+	Email                 string     `json:"email,omitempty" firestore:"email"`
+	Gender                string     `json:"gender" firestore:"gender"`
+	PhoneNumbers          string     `json:"phoneNumbers,omitempty" firestore:"phoneNumbers"`
+	BhisNumber            string     `json:"bhisNumber,omitempty" firestore:"bhisNumber"`
+	Occupation            string     `json:"occupation" firestore:"occupation"`
+	PortOfEntry           string     `json:"portOfEntry" firestore:"portOfEntry"`
+	Created               time.Time  `json:"created" firestore:"created"`
+	Modified              *time.Time `json:"modified,omitempty" firestore:"modified"`
+	CreatedBy             string     `json:"createdBy" firestore:"createdBy"`
+	ModifiedBy            string     `json:"modifiedBy" firestore:"modifiedBy"`
 }
 
 // TravellingCompanion links a person to a companion. These are usually under age persons travelling with an adult.
@@ -149,9 +158,14 @@ type Vaccine struct {
 
 // Vaccination indicates what vaccine a person received and the number of shots
 type Vaccination struct {
-	Vaccine              Vaccine   `json:"vaccine" firestore:"vaccine"`
-	NumberOfShots        int       `json:"numberOfShots" firestore:"numberOfShots"`
-	DateOfMostRecentShot time.Time `json:"dateOfMostRecentShot" firestore:"dateOfMostRecentShot"`
+	ID                   string     `json:"id" firestore:"id"`
+	Vaccine              Vaccine    `json:"vaccine" firestore:"vaccine"`
+	NumberOfShots        int        `json:"numberOfShots" firestore:"numberOfShots"`
+	DateOfMostRecentShot time.Time  `json:"dateOfMostRecentShot" firestore:"dateOfMostRecentShot"`
+	Created              time.Time  `json:"created" firestore:"created"`
+	Modified             *time.Time `json:"modified,omitempty" firestore:"modified"`
+	CreatedBy            string     `json:"createdBy" firestore:"createdBy"`
+	ModifiedBy           string     `json:"modifiedBy" firestore:"modifiedBy"`
 }
 
 // WasScreenedOnDate indicates if a person was screened on a specific date.

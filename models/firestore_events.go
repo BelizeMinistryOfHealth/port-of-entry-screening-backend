@@ -155,19 +155,6 @@ type FirestoreScreenings struct {
 					DateScreened struct {
 						StringValue string `json:"stringValue"`
 					} `json:"dateScreened"`
-					CreatedBy struct {
-						MapValue struct {
-							Fields struct {
-								MapValue struct {
-									Fields struct {
-										Email struct {
-											StringValue string `json:"stringValue"`
-										} `json:"email"`
-									} `json:"fields"`
-								} `json:"mapValue"`
-							} `json:"fields"`
-						} `json:"mapValue"`
-					} `json:"createdBy"`
 				} `json:"fields"`
 			} `json:"mapValue"`
 		} `json:"values"`
@@ -324,4 +311,48 @@ type FirestoreArrivalValue struct {
 	Fields     ArrivalFirestoreFields `json:"fields"`
 	Name       string                 `json:"name"`
 	UpdateTime time.Time              `json:"updateTime"`
+}
+
+type StringValueStruct struct {
+	StringValue string `json:"stringValue"`
+}
+
+type TimestampValueStruct struct {
+	TimestampValue time.Time `json:"timestampValue"`
+}
+
+type PersonFirestoreFields struct {
+	Fields struct {
+		FirstName             StringValueStruct `json:"firstName"`
+		MiddleName            StringValueStruct `json:"middleName"`
+		LastName              StringValueStruct `json:"lastName"`
+		Gender                StringValueStruct `json:"gender"`
+		FullName              StringValueStruct `json:"fullName"`
+		Dob                   StringValueStruct `json:"dob"`
+		Nationality           StringValueStruct `json:"nationality"`
+		PhoneNumbers          StringValueStruct `json:"phoneNumbers"`
+		PassportNumber        StringValueStruct `json:"passportNumber"`
+		OtherTravelDocument   StringValueStruct `json:"otherTravelDocument"`
+		OtherTravelDocumentID StringValueStruct `json:"otherTravelDocumentId"`
+		Email                 StringValueStruct `json:"email"`
+		BhisNumber            StringValueStruct `json:"bhisNumber"`
+		CreatedBy             struct {
+			MapValueStruct struct {
+				Fields struct {
+					ID    StringValueStruct `json:"id"`
+					Email StringValueStruct `json:"email"`
+				} `json:"Fields"`
+			} `json:"mapValue"`
+		} `json:"createdBy"`
+		Created    TimestampValueStruct `json:"created"`
+		ModifiedBy struct {
+			MapValueStruct struct {
+				Fields struct {
+					ID    StringValueStruct `json:"id"`
+					Email StringValueStruct `json:"email"`
+				} `json:"fields"`
+			} `json:"mapValue"`
+		} `json:"modifiedBy"`
+		Modified TimestampValueStruct `json:"modified"`
+	} `json:"fields"`
 }
