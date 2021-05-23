@@ -15,3 +15,9 @@ deployPersonDeletedListener:
 
 deletePersonDeletedListener:
 	gcloud functions delete PersonDeletedLIstener
+
+deployFiresearchAccessKey:
+	gcloud functions deploy FiresearchAccessKey --entry-point AccessKeyFn --runtime go113 --trigger-http --env-vars-file env.yaml --region us-east1 --allow-unauthenticated --security-level secure-always --source .
+
+deleteFiresearchAccessKey:
+	gcloud functions delete FiresearchAccessKey

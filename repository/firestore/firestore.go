@@ -31,9 +31,9 @@ func CreateFirestoreDB(ctx context.Context, projectID string) (*DB, error) {
 	}
 	authClient, _ := app.Auth(ctx)
 
-	c, err := fs.NewClient(ctx, projectID)
-	if err != nil {
-		return nil, fmt.Errorf("CreateFirestoreDB: could not create new firestore client: %w", err)
+	c, clientErr := fs.NewClient(ctx, projectID)
+	if clientErr != nil {
+		return nil, fmt.Errorf("CreateFirestoreDB: could not create new firestore client: %w", clientErr)
 	}
 	return &DB{
 		Client:      c,

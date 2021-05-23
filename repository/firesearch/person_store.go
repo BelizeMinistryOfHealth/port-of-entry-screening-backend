@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/pacedotdev/firesearch-sdk/clients/go/firesearch"
+	"time"
 )
 
 // PersonStore encapsulates a Firesearch connection and actions that can be
@@ -96,4 +97,78 @@ func (c *PersonStore) DeletePerson(ctx context.Context, ID string) error {
 		return fmt.Errorf("DeletePerson() failed: %w", err)
 	}
 	return nil
+}
+
+// SearchByName searches for a person record by their name
+func (c *PersonStore) SearchByName(ctx context.Context, accessKey, portOfEntry, name string) (
+	[]PersonSearchResult, error) {
+	filters := []firesearch.Field{
+		{
+			Key:   "portOfEntry",
+			Value: portOfEntry,
+		},
+	}
+
+	searchReq := firesearch.SearchRequest{
+		Query: firesearch.SearchQuery{
+			IndexPath: c.Service.IndexPath,
+			AccessKey: accessKey,
+			Limit:     50,
+			Text:      name,
+			Filters:   filters,
+			Select: []string{
+				"id",
+				"firstName",
+				"lastName",
+				"middleName",
+				"fullName",
+				"gender",
+				"dob",
+				"nationality",
+				"occupation",
+				"passportNumber",
+				"email",
+			},
+			SearchFields: []string{},
+		},
+	}
+	searchResp, err := c.Service.IndexService.Search(ctx, searchReq)
+	if err != nil {
+		return []PersonSearchResult{}, fmt.Errorf("SearchByName() failed: %w", err)
+	}
+	hits := searchResp.Hits
+	var persons []PersonSearchResult
+	for _, h := range hits { //nolint:typecheck
+		fields := h.Fields
+		persons = append(persons, PersonSearchResult{
+			ID:             GetField(fields, "id").(string),
+			FirstName:      GetField(fields, "firstName").(string),
+			MiddleName:     GetField(fields, "middleName").(string),
+			LastName:       GetField(fields, "lastName").(string),
+			FullName:       GetField(fields, "fullName").(string),
+			Gender:         GetField(fields, "gender").(string),
+			Nationality:    GetField(fields, "nationality").(string),
+			Dob:            GetField(fields, "dob").(time.Time),
+			Occupation:     GetField(fields, "occupation").(string),
+			PassportNumber: GetField(fields, "passportNumber").(string),
+			Email:          GetField(fields, "email").(string),
+		})
+
+	}
+	return persons, nil
+}
+
+// PersonSearchResult is the result from searching for persons in firesearch
+type PersonSearchResult struct {
+	ID             string    `json:"id"`
+	FirstName      string    `json:"firstName"`
+	LastName       string    `json:"lastName"`
+	MiddleName     string    `json:"middleName"`
+	FullName       string    `json:"fullName"`
+	Gender         string    `json:"gender"`
+	Nationality    string    `json:"nationality"`
+	Dob            time.Time `json:"dob"`
+	Occupation     string    `json:"occupation"`
+	PassportNumber string    `json:"passportNumber"`
+	Email          string    `json:"email"`
 }

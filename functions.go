@@ -4,6 +4,7 @@ import (
 	"bz.moh.epi/poebackend/handlers"
 	"bz.moh.epi/poebackend/models"
 	"bz.moh.epi/poebackend/repository/firesearch"
+	"bz.moh.epi/poebackend/repository/firestore"
 	"context"
 	"fmt"
 	"github.com/cloudevents/sdk-go/v2/event/datacodec/json"
@@ -57,6 +58,7 @@ func HelloPubSub(ctx context.Context, m PubSubMessage) error {
 	return nil
 }
 
+// PersonsHook is triggered when a new record is inserted in the persons collection
 func PersonsHook(ctx context.Context, event models.FirestorePersonEvent) error {
 	personStore := firesearch.PersonStore{Service: personFiresearchService}
 	result, err := handlers.PersonCreated(ctx, event, personStore)
@@ -70,6 +72,7 @@ func PersonsHook(ctx context.Context, event models.FirestorePersonEvent) error {
 	return nil
 }
 
+// PersonDeletedListener is the function triggered when a person is deleted
 func PersonDeletedListener(ctx context.Context, event models.FirestorePersonEvent) error {
 	personStore := firesearch.PersonStore{
 		Service: personFiresearchService,
@@ -84,6 +87,20 @@ func PersonDeletedListener(ctx context.Context, event models.FirestorePersonEven
 		return fmt.Errorf("PersonDeletedListener failed: %w", err)
 	}
 	return nil
+}
+
+// AccessKeyFn is the function that returns a firesearch access key
+func AccessKeyFn(w http.ResponseWriter, r *http.Request) {
+	projectID := os.Getenv("PROJECT_ID")
+	firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"handler": "AccessKeyFn",
+			"message": "error creating firestore db connection",
+		}).WithError(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+	handlers.AccessKeyHandler(*firestoreDb, w, r)
 }
 
 // GetServer exposes Server to modify some settings

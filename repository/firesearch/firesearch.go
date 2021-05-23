@@ -230,3 +230,13 @@ func (f Service) CreatePerson(ctx context.Context, person models.Person) error {
 func (f Service) UpdatePerson(ctx context.Context, person models.Person) error {
 	return f.PutDoc(ctx, person)
 }
+
+// GetField retrieves the value of a field that corresponds to a key
+func GetField(fields []firesearch.Field, key string) interface{} {
+	for _, f := range fields {
+		if f.Key == key {
+			return f.Value
+		}
+	}
+	return nil
+}
