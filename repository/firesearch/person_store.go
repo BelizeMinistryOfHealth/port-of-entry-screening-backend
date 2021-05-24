@@ -22,16 +22,6 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 			ID: person.ID,
 			SearchFields: []firesearch.SearchField{
 				{
-					Key:   "firstName",
-					Value: person.FirstName,
-					Store: true,
-				},
-				{
-					Key:   "lastName",
-					Value: person.LastName,
-					Store: true,
-				},
-				{
 					Key:   "fullName",
 					Value: person.FullName,
 					Store: true,

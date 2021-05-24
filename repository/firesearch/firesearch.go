@@ -45,7 +45,7 @@ func (f Service) CreateIndex(ctx context.Context) error {
 			Language:      "english",
 			KeepStopWords: false,
 			CaseSensitive: false,
-			NoStem:        false,
+			NoStem:        true,
 		},
 	}
 	_, err := f.IndexService.CreateIndex(ctx, createIndexReq)

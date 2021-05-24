@@ -20,6 +20,17 @@ func TestCreateIndex(t *testing.T) {
 	}
 }
 
+func TestDeleteIndex(t *testing.T) {
+	ctx := context.Background()
+	indexPath := "persons_index"
+	deleteIndexReq := firesearch.DeleteIndexRequest{IndexPath: indexPath}
+	firesearchService := firesearch2.CreateFiresearchService("Persons Index", indexPath, "PGIA")
+	_, err := firesearchService.IndexService.DeleteIndex(ctx, deleteIndexReq)
+	if err != nil {
+		t.Errorf("failed to delete index: %v", err)
+	}
+}
+
 func TestPutDoc(t *testing.T) {
 
 	firesearchService := firesearch2.CreateFiresearchService(
