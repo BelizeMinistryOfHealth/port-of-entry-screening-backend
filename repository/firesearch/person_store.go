@@ -26,10 +26,20 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 					Value: person.FullName,
 					Store: true,
 				},
+				{
+					Key:   "passportNumber",
+					Value: person.PassportNumber,
+					Store: true,
+				},
+				{
+					Key:   "email",
+					Value: person.Email,
+					Store: true,
+				},
 			},
 			Fields: []firesearch.Field{
 				{
-					Key:   "ID",
+					Key:   "id",
 					Value: person.ID,
 				},
 				{
@@ -53,16 +63,8 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 					Value: person.PhoneNumbers,
 				},
 				{
-					Key:   "passportNumber",
-					Value: person.PassportNumber,
-				},
-				{
 					Key:   "occupation",
 					Value: person.Occupation,
-				},
-				{
-					Key:   "email",
-					Value: person.Email,
 				},
 			},
 		},
