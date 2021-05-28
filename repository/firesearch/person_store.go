@@ -36,6 +36,11 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 					Value: person.Email,
 					Store: true,
 				},
+				{
+					Key:   "otherTravelDocumentId",
+					Value: person.OtherTravelDocumentID,
+					Store: true,
+				},
 			},
 			Fields: []firesearch.Field{
 				{
