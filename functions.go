@@ -63,7 +63,8 @@ func PersonsHook(ctx context.Context, event models.FirestorePersonEvent) error {
 	personStore := firesearch.PersonStore{Service: personFiresearchService}
 	result, err := handlers.PersonCreated(ctx, event, personStore)
 	if err != nil {
-		return err
+		log.WithError(err).Info("creating user index failed")
+		return fmt.Errorf("new person liatener failed: %w", err)
 	}
 	log.WithFields(log.Fields{
 		"result":  result,
@@ -86,6 +87,21 @@ func PersonDeletedListener(ctx context.Context, event models.FirestorePersonEven
 
 		return fmt.Errorf("PersonDeletedListener failed: %w", err)
 	}
+	return nil
+}
+
+// PersonUpdatedListener is triggered when a record is updated in the persons collection
+func PersonUpdatedListener(ctx context.Context, event models.FirestorePersonEvent) error {
+	personStore := firesearch.PersonStore{Service: personFiresearchService}
+	result, err := handlers.PersonCreated(ctx, event, personStore)
+	if err != nil {
+		log.WithError(err).Info("update person failed")
+		return fmt.Errorf("update Person Failed: %w", err)
+	}
+	log.WithFields(log.Fields{
+		"result":  result,
+		"context": ctx,
+	}).Info("update person event")
 	return nil
 }
 

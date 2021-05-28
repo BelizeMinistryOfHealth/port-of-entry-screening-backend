@@ -14,7 +14,13 @@ deployPersonDeletedListener:
 	gcloud functions deploy PersonDeletedListener --entry-point PersonDeletedListener --runtime go113 --trigger-event providers/cloud.firestore/eventTypes/document.delete  --region us-east1 --trigger-resource "projects/epi-belize-staging/databases/(default)/documents/persons/{pushId}" --source . --env-vars-file env.yaml
 
 deletePersonDeletedListener:
-	gcloud functions delete PersonDeletedLIstener
+	gcloud functions delete PersonDeletedListener
+
+deployPersonUpdatedListener:
+	gcloud functions deploy PersonUpdatedListener --entry-point PersonUpdatedListener --runtime go113 --trigger-event providers/cloud.firestore/eventTypes/document.update  --region us-east1 --trigger-resource "projects/epi-belize-staging/databases/(default)/documents/persons/{pushId}" --source . --env-vars-file env.yaml
+
+deletePersonUpdatedListener:
+	gcloud functions delete PersonUpdatedListener
 
 deployFiresearchAccessKey:
 	gcloud functions deploy FiresearchAccessKey --entry-point AccessKeyFn --runtime go113 --trigger-http --env-vars-file env.yaml --region us-east1 --allow-unauthenticated --security-level secure-always --source .
