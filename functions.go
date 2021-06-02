@@ -105,7 +105,7 @@ func PersonUpdatedListener(ctx context.Context, event models.FirestorePersonEven
 	return nil
 }
 
-func ScreeningListener(ctx context.Context, event interface{}) error {
+func ScreeningListener(ctx context.Context, event models.FirestoreScreeningEvent) error {
 	log.WithFields(log.Fields{
 		"event": event,
 	}).Info("screening event")

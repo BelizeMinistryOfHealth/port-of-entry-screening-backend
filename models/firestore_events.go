@@ -52,113 +52,141 @@ type FirestoreAddresses struct {
 
 // FirestoreScreenings is how the screenings are represented in a Firestore event
 type FirestoreScreenings struct {
-	ArrayValue struct {
-		Values []struct {
-			MapValue struct {
-				Fields struct {
-					ContactWithHealthFacility struct {
-						BooleanValue bool `json:"booleanValue"`
-					} `json:"contactWithHealthFacility"`
-					OtherSymptoms struct {
-						StringValue string `json:"stringValue"`
-					} `json:"otherSymptoms"`
-					Location struct {
-						StringValue string `json:"stringValue"`
-					} `json:"location"`
-					DiagnosedWithCovid19 struct {
-						BooleanValue bool `json:"booleanValue"`
-					} `json:"diagnosedWithCovid19"`
-					Comments struct {
-						StringValue string `json:"stringValue"`
-					} `json:"comments"`
-					TookPcrTestInPast72Hours struct {
-						BooleanValue bool `json:"boolean"`
-					} `json:"tookPcrTestInPast72Hours"`
-					FluLikeSymptoms struct {
-						MapValue struct {
-							Fields struct {
-								Malaise struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"malaise"`
-								Cough struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"cough"`
-								Headache struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"headache"`
-								BreathDifficulty struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"breathDifficulty"`
-								SoreThroat struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"soreThroat"`
-								OtherFluLikeSymptoms struct {
-									StringValue string `json:"stringValue"`
-								} `json:"otherFluLikeSymptoms"`
-								BreathShort struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"breathShort"`
-								Fever struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"fever"`
-								RunnyNose struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"runnyNose"`
-								Nausea struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"nausea"`
-								Diarrhea struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"diarrhea"`
-								ShortnessOfBreath struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"shortnessOfBreath"`
-								Chills struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"chills"`
-								Anosmia struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"anosmia"`
-								Aguesia struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"aguesia"`
-								Bleeding struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"bleeding"`
-								JointMusclePain struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"jointMusclePain"`
-								EyeFacialPain struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"eyeFacialPain"`
-								GeneralizedRash struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"generalizedRash"`
-								BlurredVision struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"blurredVision"`
-								AbdominalPain struct {
-									BooleanValue bool `json:"booleanValue"`
-								} `json:"abdominalPain"`
-								Other struct {
-									StringValue string `json:"stringValue"`
-								} `json:"other"`
-							} `json:"fields"`
-						} `json:"mapValue"`
-					} `json:"fluLikeSymptoms"`
-					Temperature struct {
-						DoubleValue float32 `json:"doubleValue"`
-					} `json:"temperature"`
-					ID struct {
-						StringValue string `json:"stringValue"`
-					} `json:"id"`
-					DateScreened struct {
-						StringValue string `json:"stringValue"`
-					} `json:"dateScreened"`
-				} `json:"fields"`
-			} `json:"mapValue"`
-		} `json:"values"`
-	} `json:"arrayValue"`
+	Comments struct {
+		StringValue string `json:"stringValue"`
+	} `json:"comments"`
+	CreatedBy struct {
+		MapValue struct {
+			Fields struct {
+				Email struct {
+					StringValue string `json:"stringValue"`
+				} `json:"email"`
+				ID struct {
+					StringValue string `json:"stringValue"`
+				} `json:"id"`
+			} `json:"fields"`
+		} `json:"mapValue"`
+	} `json:"createdBy"`
+	DiagnosedWithCovid19 struct {
+		BooleanValue bool `json:"booleanValue"`
+	} `json:"diagnosedWithCovid19"`
+	FluLikeSymptoms struct {
+		MapValue struct {
+			Fields struct {
+				AbdominalPain struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"abdominalPain"`
+				Aguesia struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"aguesia"`
+				Anosmia struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"anosmia"`
+				Bleeding struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"bleeding"`
+				BlurredVision struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"blurredVision"`
+				BreathDifficulty struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"breathDifficulty"`
+				BreathShort struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"breathShort"`
+				Chills struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"chills"`
+				Cough struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"cough"`
+				Diarrhea struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"diarrhea"`
+				EyeFacialPain struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"eyeFacialPain"`
+				Fever struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"fever"`
+				GeneralizedRash struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"generalizedRash"`
+				Headache struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"headache"`
+				JointMusclePain struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"jointMusclePain"`
+				Malaise struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"malaise"`
+				Nausea struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"nausea"`
+				Other struct {
+					StringValue string `json:"stringValue"`
+				} `json:"other"`
+				RunnyNose struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"runnyNose"`
+				ShortnessOfBreath struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"shortnessOfBreath"`
+				SoreThroat struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"soreThroat"`
+				Vomiting struct {
+					BooleanValue bool `json:"booleanValue"`
+				} `json:"vomiting"`
+			} `json:"fields"`
+		} `json:"mapValue"`
+	} `json:"fluLikeSymptoms"`
+	ID struct {
+		StringValue string `json:"stringValue"`
+	} `json:"id"`
+	Location struct {
+		StringValue string `json:"stringValue"`
+	} `json:"location"`
+	Modified struct {
+		TimestampValue string `json:"timestampValue"`
+	} `json:"modified"`
+	ModifiedBy struct {
+		MapValue struct {
+			Fields struct {
+				Email struct {
+					StringValue string `json:"stringValue"`
+				} `json:"email"`
+				ID struct {
+					StringValue string `json:"stringValue"`
+				} `json:"id"`
+			} `json:"fields"`
+		} `json:"mapValue"`
+	} `json:"modifiedBy"`
+	Screened struct {
+		TimestampValue string `json:"timestampValue"`
+	} `json:"screened"`
+	Temperature struct {
+		IntegerValue string `json:"integerValue"`
+	} `json:"temperature"`
+	TookPcrTestInPast72Hours struct {
+		BooleanValue bool `json:"booleanValue"`
+	} `json:"tookPcrTestInPast72Hours"`
+	Vaccination struct {
+		MapValue struct {
+			Fields struct {
+				DateOfMostRecentShot struct {
+					TimestampValue string `json:"timestampValue"`
+				} `json:"dateOfMostRecentShot"`
+				Name struct {
+					StringValue string `json:"stringValue"`
+				} `json:"name"`
+				NumberOfShots struct {
+					IntegerValue string `json:"integerValue"`
+				} `json:"numberOfShots"`
+			} `json:"fields"`
+		} `json:"mapValue"`
+	} `json:"vaccination"`
 }
 
 // ArrivalFirestoreFields is how the arrivals are represented in a Firestore event
@@ -263,7 +291,7 @@ type ArrivalFirestoreFields struct {
 				PurposeOfTrip struct {
 					StringValue string `json:"stringValue"`
 				} `json:"purposeOfTrip"`
-				Screenings           FirestoreScreenings `json:"screenings"`
+				//Screenings           FirestoreScreenings `json:"screenings"`
 				TravellingCompanions struct {
 					NullValue interface{} `json:"nullValue"`
 				} `json:"travellingCompanions"`
@@ -397,4 +425,19 @@ type FirestorePersonValue struct {
 	Fields     PersonFirestoreFields `json:"fields"`
 	Name       string                `json:"name"`
 	UpdateTime time.Time             `json:"updateTime"`
+}
+
+type FirestoreScreeningEvent struct {
+	OldValue   FirestoreScreeningValue `json:"oldValue"`
+	Value      FirestoreScreeningValue `json:"value"`
+	UpdateMask struct {
+		FieldPaths []string `json:"fieldPaths"`
+	} `json:"updateMask"`
+}
+
+type FirestoreScreeningValue struct {
+	CreateTime time.Time           `json:"createTime"`
+	Fields     FirestoreScreenings `json:"fields"`
+	Name       string              `json:"name"`
+	UpdateTime time.Time           `json:"updateTime"`
 }
