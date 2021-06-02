@@ -7,6 +7,7 @@ import (
 	"fmt"
 )
 
+// ArrivalsStoreService store for interacting with persisted arrivals data
 type ArrivalsStoreService struct {
 	db         *DB
 	collection string
