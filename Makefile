@@ -27,3 +27,15 @@ deployFiresearchAccessKey:
 
 deleteFiresearchAccessKey:
 	gcloud functions delete FiresearchAccessKey
+
+deployScreeningCreatedListener:
+	gcloud functions deploy ScreeningCreatedListener --entry-point ScreeningListener --runtime go113 --trigger-event providers/cloud.firestore/eventTypes/document.create  --region us-east1 --trigger-resource "projects/epi-belize-staging/databases/(default)/documents/screenings/{pushId}" --source . --env-vars-file env.yaml
+
+deleteScreeningCreatedListener:
+	gcloud functions delete ScreeningCreatedListener
+
+deployScreeningUpdatedListener:
+	gcloud functions deploy ScreeningUpdatedListener --entry-point ScreeningListener --runtime go113 --trigger-event providers/cloud.firestore/eventTypes/document.update  --region us-east1 --trigger-resource "projects/epi-belize-staging/databases/(default)/documents/screenings/{pushId}" --source . --env-vars-file env.yaml
+
+deleteScreeningUpdatedListener:
+	gcloud functions delete ScreeningUpdatedListener

@@ -83,11 +83,6 @@ func (f Service) PutDoc(ctx context.Context, person models.Person) error {
 					Store: true,
 				},
 				{
-					Key:   "tripID",
-					Value: person.Arrival.TripID,
-					Store: true,
-				},
-				{
 					Key:   "portOfEntry",
 					Value: person.PortOfEntry,
 					Store: true,

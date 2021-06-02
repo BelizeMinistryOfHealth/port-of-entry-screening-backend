@@ -105,6 +105,14 @@ func PersonUpdatedListener(ctx context.Context, event models.FirestorePersonEven
 	return nil
 }
 
+func ScreeningListener(ctx context.Context, event interface{}) error {
+	log.WithFields(log.Fields{
+		"event": event,
+	}).Info("screening event")
+
+	return nil
+}
+
 // AccessKeyFn is the function that returns a firesearch access key
 func AccessKeyFn(w http.ResponseWriter, r *http.Request) {
 	projectID := os.Getenv("PROJECT_ID")

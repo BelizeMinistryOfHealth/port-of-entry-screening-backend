@@ -4,11 +4,10 @@ import "time"
 
 // AddressInBelize is the address that the person is residing within Belize
 type AddressInBelize struct {
-	Address           Address    `json:"address" firestore:"address"`
-	ControlID         string     `json:"controlId" firestore:"controlId"`
-	AccommodationName string     `json:"accommodationName" firestore:"accommodationName"`
-	StartDate         time.Time  `json:"startDate" firestore:"startDate"`
-	EndDate           *time.Time `json:"endDate" firestore:"endDate"`
+	ID                string  `json:"id" firestore:"id"`
+	Address           Address `json:"address" firestore:"address"`
+	ControlID         string  `json:"controlId" firestore:"controlId"`
+	AccommodationName string  `json:"accommodationName" firestore:"accommodationName"`
 }
 
 // Community represents a community in a district within Belize
@@ -27,6 +26,7 @@ type Address struct {
 // ArrivalInfo contains information specific to an arrival, including port of embarkation and
 // vessel information
 type ArrivalInfo struct {
+	ID                   string    `json:"id" firestore:"id"`
 	DateOfArrival        time.Time `json:"dateOfArrival" firestore:"dateOfArrival"`
 	ModeOfTravel         string    `json:"modeOfTravel" firestore:"modeOfTravel"`
 	VesselNumber         string    `json:"vesselNumber" firestore:"vesselNumber"`
@@ -35,6 +35,7 @@ type ArrivalInfo struct {
 	PortOfEntry          string    `json:"portOfEntry" firestore:"portOfEntry"`
 	TravelOrigin         string    `json:"travelOrigin" firestore:"travelOrigin"`
 	CountriesVisited     string    `json:"countriesVisited" firestore:"countriesVisited"`
+	PurposeOfTrip        string    `json:"purposeOfTrip" firestore:"purposeOfTrip"`
 }
 
 /// Screening Structs
@@ -72,22 +73,35 @@ type Editor struct {
 	ID    string `json:"id" firestore:"id"`
 }
 
+// Vaccine indicates how many shots are required for a vaccine
+type Vaccine struct {
+	Name          string `json:"name" firestore:"name"`
+	NumberOfShots int    `json:"numberOfShots" firestore:"numberOfShots"`
+}
+
+// Vaccination indicates what vaccine a person received and the number of shots
+type Vaccination struct {
+	Name                 string    `json:"name" firestore:"name"`
+	NumberOfShots        int       `json:"numberOfShots" firestore:"numberOfShots"`
+	DateOfMostRecentShot time.Time `json:"dateOfMostRecentShot" firestore:"dateOfMostRecentShot"`
+}
+
 // Screening is the information collected when screening a person.
 type Screening struct {
-	ID                        string          `json:"id" firestore:"id"`
-	OtherSymptoms             string          `json:"otherSymptoms" firestore:"otherSymptoms"`
-	DiagnosedWithCovid19      bool            `json:"diagnosedWithCovid19" firestore:"diagnosedWithCovid19"`
-	ContactWithHealthFacility bool            `json:"contactWithHealthFacility" firestore:"contactWithHealthFacility"`
-	Comments                  string          `json:"comments" firestore:"comments"`
-	Location                  string          `json:"location" firestore:"location"`
-	DateScreened              time.Time       `json:"dateScreened" firestore:"dateScreened"`
-	Temperature               float32         `json:"temperature" firestore:"temperature"`
-	FluLikeSymptoms           FluLikeSymptoms `json:"fluLikeSymptoms" firestore:"fluLikeSymptoms"`
-	TookPcrTestInPast72Hours  bool            `json:"tookPcrTestInPast72Hours" firestore:"tookPcrTestInPast72Hours"`
-	Created                   time.Time       `json:"created" firestore:"created"`
-	Modified                  *time.Time      `json:"modified,omitempty" firestore:"modified"`
-	CreatedBy                 string          `json:"createdBy" firestore:"createdBy"`
-	ModifiedBy                string          `json:"modifiedBy" firestore:"modifiedBy"`
+	ID string `json:"id" firestore:"id"`
+	//OtherSymptoms             string          `json:"otherSymptoms" firestore:"otherSymptoms"`
+	DiagnosedWithCovid19 bool `json:"diagnosedWithCovid19" firestore:"diagnosedWithCovid19"`
+	//ContactWithHealthFacility bool            `json:"contactWithHealthFacility" firestore:"contactWithHealthFacility"`
+	Comments                 string          `json:"comments" firestore:"comments"`
+	Location                 string          `json:"location" firestore:"location"`
+	DateScreened             time.Time       `json:"screened" firestore:"screened"`
+	Temperature              float32         `json:"temperature" firestore:"temperature"`
+	FluLikeSymptoms          FluLikeSymptoms `json:"fluLikeSymptoms" firestore:"fluLikeSymptoms"`
+	TookPcrTestInPast72Hours bool            `json:"tookPcrTestInPast72Hours" firestore:"tookPcrTestInPast72Hours"`
+	Vaccination              Vaccination     `json:"vaccination" firestore:"vaccination"`
+	Modified                 *time.Time      `json:"modified,omitempty" firestore:"modified"`
+	CreatedBy                Editor          `json:"createdBy" firestore:"createdBy"`
+	ModifiedBy               Editor          `json:"modifiedBy" firestore:"modifiedBy"`
 }
 
 // PersonalInfo about a person, mostly demographic in nature.
@@ -123,7 +137,7 @@ type TravellingCompanion struct {
 
 // Arrival is the information related to a specific arrival to the country.
 type Arrival struct {
-	TripID                   string                `json:"tripId" firestore:"tripId"`
+	ID                       string                `json:"id" firestore:"id"`
 	ArrivalInfo              ArrivalInfo           `json:"arrivalInfo" firestore:"arrivalInfo"`
 	HotelAddress             AddressInBelize       `json:"hotelAddress" firestore:"hotelAddress"`
 	Address                  AddressInBelize       `json:"address" firestore:"address"`
@@ -147,24 +161,6 @@ type Person struct {
 	Created            time.Time    `json:"created" firestore:"created"`
 	Modified           *time.Time   `json:"modified,omitempty" firestore:"modified"`
 	PortOfEntry        string       `json:"portOfEntry" firestore:"portOfEntry"`
-}
-
-// Vaccine indicates how many shots are required for a vaccine
-type Vaccine struct {
-	Name          string `json:"name" firestore:"name"`
-	NumberOfShots int    `json:"numberOfShots" firestore:"numberOfShots"`
-}
-
-// Vaccination indicates what vaccine a person received and the number of shots
-type Vaccination struct {
-	ID                   string     `json:"id" firestore:"id"`
-	Vaccine              Vaccine    `json:"vaccine" firestore:"vaccine"`
-	NumberOfShots        int        `json:"numberOfShots" firestore:"numberOfShots"`
-	DateOfMostRecentShot time.Time  `json:"dateOfMostRecentShot" firestore:"dateOfMostRecentShot"`
-	Created              time.Time  `json:"created" firestore:"created"`
-	Modified             *time.Time `json:"modified,omitempty" firestore:"modified"`
-	CreatedBy            string     `json:"createdBy" firestore:"createdBy"`
-	ModifiedBy           string     `json:"modifiedBy" firestore:"modifiedBy"`
 }
 
 // WasScreenedOnDate indicates if a person was screened on a specific date.

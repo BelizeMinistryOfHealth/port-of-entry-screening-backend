@@ -259,10 +259,7 @@ type ArrivalFirestoreFields struct {
 				Modified struct {
 					StringValue string `json:"stringValue"`
 				} `json:"modified"`
-				Addresses FirestoreAddresses `json:"addresses"`
-				TripID    struct {
-					StringValue string `json:"stringValue"`
-				} `json:"tripId"`
+				Addresses     FirestoreAddresses `json:"addresses"`
 				PurposeOfTrip struct {
 					StringValue string `json:"stringValue"`
 				} `json:"purposeOfTrip"`

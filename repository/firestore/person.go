@@ -57,10 +57,6 @@ func (p *PersonStoreService) UpdatePerson(ctx context.Context, person models.Per
 			Path:  "arrival.purposeOfTrip",
 			Value: person.Arrival.PurposeOfTrip,
 		},
-		{
-			Path:  "arrival.tripId",
-			Value: person.Arrival.TripID,
-		},
 	})
 
 	if err != nil {

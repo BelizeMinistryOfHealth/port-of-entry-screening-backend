@@ -180,7 +180,6 @@ func ToAddressInBelize(ctx context.Context, locationsStore *firesearch.LocationS
 		district := ToDistrict(s.District)
 		communityName := s.Community
 		community, err := locationsStore.FindByName(ctx, communityName, district)
-		startDate, _ := time.Parse(isoDateLayout, s.TravelDate)
 		if err != nil {
 			log.WithFields(log.Fields{"sibArrival": s}).WithError(err).Error("failed to query for community")
 			return models.AddressInBelize{}, fmt.Errorf("ToAddressInBelize error: %w", err)
@@ -196,8 +195,6 @@ func ToAddressInBelize(ctx context.Context, locationsStore *firesearch.LocationS
 			},
 			ControlID:         "",
 			AccommodationName: "",
-			StartDate:         startDate,
-			EndDate:           nil,
 		}
 		return address, nil
 	}
@@ -295,7 +292,6 @@ func (s *Arrival) ToPerson() models.Person {
 			Occupation:            s.Occupation,
 		},
 		Arrival: models.Arrival{
-			TripID: s.TripID,
 			ArrivalInfo: models.ArrivalInfo{
 				DateOfArrival:        travelDate,
 				ModeOfTravel:         ToTravelMode(s.TravelMode),
@@ -325,12 +321,11 @@ func (s *Arrival) ToPerson() models.Person {
 
 // PayloadItems represents the format of how the items are encoded in the TravellersData
 type PayloadItems struct {
-	ID            string    `json:"id"`
-	Owner         string    `json:"owner"`
-	CreatedAt     time.Time `json:"createdAt"`
-	UpdatedAt     time.Time `json:"updatedAt"`
-	CurrentTripID string    `json:"currentTripId"`
-	Arrivals      struct {
+	ID        string    `json:"id"`
+	Owner     string    `json:"owner"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Arrivals  struct {
 		Items []Arrival `json:"items"`
 	} `json:"arrivals"`
 }
