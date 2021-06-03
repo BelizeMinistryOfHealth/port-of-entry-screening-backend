@@ -69,18 +69,18 @@ func (p *PersonStoreService) UpdatePerson(ctx context.Context, person models.Per
 var ErrNoResult = errors.New("no record found")
 
 // GetByID retrieves a person by its ID
-func (p *PersonStoreService) GetByID(ctx context.Context, id string) (models.Person, error) {
+func (p *PersonStoreService) GetByID(ctx context.Context, id string) (models.PersonalInfo, error) {
 	dsnap, err := p.colRef.Doc(id).Get(ctx)
 	if !dsnap.Exists() {
-		return models.Person{}, ErrNoResult
+		return models.PersonalInfo{}, ErrNoResult
 	}
 	if err != nil {
-		return models.Person{}, fmt.Errorf("PersonStoreService.GetByID: error retrieving person: %w", err)
+		return models.PersonalInfo{}, fmt.Errorf("PersonStoreService.GetByID: error retrieving person: %w", err)
 	}
-	var person models.Person
+	var person models.PersonalInfo
 	decodeErr := dsnap.DataTo(&person)
 	if decodeErr != nil {
-		return models.Person{}, fmt.Errorf("PersonStoreService.GetByID: error decoding person record: %w", decodeErr)
+		return models.PersonalInfo{}, fmt.Errorf("PersonStoreService.GetByID: error decoding person record: %w", decodeErr)
 	}
 	return person, nil
 }

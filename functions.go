@@ -105,10 +105,27 @@ func PersonUpdatedListener(ctx context.Context, event models.FirestorePersonEven
 	return nil
 }
 
+// ScreeningListener Cloud Function triggered when a screening is created or updated
 func ScreeningListener(ctx context.Context, event models.FirestoreScreeningEvent) error {
 	log.WithFields(log.Fields{
 		"event": event,
 	}).Info("screening event")
+	projectID := os.Getenv("PROJECT_ID")
+	firestoreDB, err := firestore.CreateFirestoreDB(ctx, projectID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"event": event,
+		}).WithError(err).Info("failed to create firestore connection")
+		return fmt.Errorf("failed to create firestore connection: %w", err)
+	}
+
+	personStore := firestore.CreatePersonService(firestoreDB, "persons")
+	arrivalStore := firestore.CreateArrivalsStoreService(firestoreDB, "arrivals")
+	addressStore := firestore.CreateAddressStoreService(firestoreDB, "addresses")
+	godataErr := handlers.ScreeningEventHandler(ctx, event, personStore, arrivalStore, addressStore)
+	if godataErr != nil {
+		return fmt.Errorf("godata persistence failed: %w", godataErr)
+	}
 
 	return nil
 }

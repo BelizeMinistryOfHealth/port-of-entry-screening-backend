@@ -26,16 +26,18 @@ type Address struct {
 // ArrivalInfo contains information specific to an arrival, including port of embarkation and
 // vessel information
 type ArrivalInfo struct {
-	ID                   string    `json:"id" firestore:"id"`
-	DateOfArrival        time.Time `json:"dateOfArrival" firestore:"dateOfArrival"`
-	ModeOfTravel         string    `json:"modeOfTravel" firestore:"modeOfTravel"`
-	VesselNumber         string    `json:"vesselNumber" firestore:"vesselNumber"`
-	CountryOfEmbarkation string    `json:"countryOfEmbarkation" firestore:"countryOfEmbarkation"`
-	DateOfEmbarkation    string    `json:"dateOfEmbarkation" firestore:"dateOfEmbarkation"`
-	PortOfEntry          string    `json:"portOfEntry" firestore:"portOfEntry"`
-	TravelOrigin         string    `json:"travelOrigin" firestore:"travelOrigin"`
-	CountriesVisited     string    `json:"countriesVisited" firestore:"countriesVisited"`
-	PurposeOfTrip        string    `json:"purposeOfTrip" firestore:"purposeOfTrip"`
+	ID                       string    `json:"id" firestore:"id"`
+	DateOfArrival            time.Time `json:"dateOfArrival" firestore:"dateOfArrival"`
+	ModeOfTravel             string    `json:"modeOfTravel" firestore:"modeOfTravel"`
+	VesselNumber             string    `json:"vesselNumber" firestore:"vesselNumber"`
+	CountryOfEmbarkation     string    `json:"countryOfEmbarkation" firestore:"countryOfEmbarkation"`
+	DateOfEmbarkation        time.Time `json:"dateOfEmbarkation" firestore:"dateOfEmbarkation"`
+	PortOfEntry              string    `json:"portOfEntry" firestore:"portOfEntry"`
+	TravelOrigin             string    `json:"travelOrigin" firestore:"travelOrigin"`
+	CountriesVisited         string    `json:"countriesVisited" firestore:"countriesVisited"`
+	PurposeOfTrip            string    `json:"purposeOfTrip" firestore:"purposeOfTrip"`
+	ContactPerson            string    `json:"contactPerson" firestore:"contactPerson"`
+	ContactPersonPhoneNumber string    `json:"contactPersonPhoneNumber" firestore:"contactPersonPhoneNumber"`
 }
 
 /// Screening Structs
@@ -121,6 +123,7 @@ type PersonalInfo struct {
 	PhoneNumbers          string    `json:"phoneNumbers,omitempty" firestore:"phoneNumbers"`
 	BhisNumber            string    `json:"bhisNumber,omitempty" firestore:"bhisNumber"`
 	Occupation            string    `json:"occupation" firestore:"occupation"`
+	PortOfEntry           string    `json:"portOfEntry" firestore:"portOfEntry"`
 	Created               time.Time `json:"created" firestore:"created"`
 	Modified              time.Time `json:"modified,omitempty" firestore:"modified"`
 	CreatedBy             Editor    `json:"createdBy" firestore:"createdBy"`

@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 // FirestoreAddresses is how the addresses are encoded in a Firestore event
 type FirestoreAddresses struct {
@@ -50,99 +53,169 @@ type FirestoreAddresses struct {
 	} `json:"arrayValue"`
 }
 
+type FluLikeSymptomsEvent struct {
+	MapValue struct {
+		Fields struct {
+			AbdominalPain struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"abdominalPain"`
+			Aguesia struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"aguesia"`
+			Anosmia struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"anosmia"`
+			Bleeding struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"bleeding"`
+			BlurredVision struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"blurredVision"`
+			BreathDifficulty struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"breathDifficulty"`
+			BreathShort struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"breathShort"`
+			Chills struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"chills"`
+			Cough struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"cough"`
+			Diarrhea struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"diarrhea"`
+			EyeFacialPain struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"eyeFacialPain"`
+			Fever struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"fever"`
+			GeneralizedRash struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"generalizedRash"`
+			Headache struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"headache"`
+			JointMusclePain struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"jointMusclePain"`
+			Malaise struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"malaise"`
+			Nausea struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"nausea"`
+			Other struct {
+				StringValue string `json:"stringValue"`
+			} `json:"other"`
+			RunnyNose struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"runnyNose"`
+			ShortnessOfBreath struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"shortnessOfBreath"`
+			SoreThroat struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"soreThroat"`
+			Vomiting struct {
+				BooleanValue bool `json:"booleanValue"`
+			} `json:"vomiting"`
+		} `json:"fields"`
+	} `json:"mapValue"`
+}
+
+func (f *FluLikeSymptomsEvent) ToFluLikeSymptoms() FluLikeSymptoms {
+	return FluLikeSymptoms{
+		Fever:             f.MapValue.Fields.Fever.BooleanValue,
+		Headache:          f.MapValue.Fields.Headache.BooleanValue,
+		Cough:             f.MapValue.Fields.Cough.BooleanValue,
+		Malaise:           f.MapValue.Fields.Malaise.BooleanValue,
+		SoreThroat:        f.MapValue.Fields.SoreThroat.BooleanValue,
+		BreathShort:       f.MapValue.Fields.BreathShort.BooleanValue,
+		BreathDifficulty:  f.MapValue.Fields.BreathDifficulty.BooleanValue,
+		RunnyNose:         f.MapValue.Fields.RunnyNose.BooleanValue,
+		Nausea:            f.MapValue.Fields.Nausea.BooleanValue,
+		Diarrhea:          f.MapValue.Fields.Diarrhea.BooleanValue,
+		ShortnessOfBreath: f.MapValue.Fields.ShortnessOfBreath.BooleanValue,
+		Chills:            f.MapValue.Fields.Chills.BooleanValue,
+		Anosmia:           f.MapValue.Fields.Anosmia.BooleanValue,
+		Aguesia:           f.MapValue.Fields.Aguesia.BooleanValue,
+		Bleeding:          f.MapValue.Fields.Bleeding.BooleanValue,
+		JointMusclePain:   f.MapValue.Fields.JointMusclePain.BooleanValue,
+		EyeFacialPain:     f.MapValue.Fields.EyeFacialPain.BooleanValue,
+		GeneralizedRash:   f.MapValue.Fields.GeneralizedRash.BooleanValue,
+		BlurredVision:     f.MapValue.Fields.BlurredVision.BooleanValue,
+		AbdominalPain:     f.MapValue.Fields.AbdominalPain.BooleanValue,
+		Vomiting:          f.MapValue.Fields.Vomiting.BooleanValue,
+		Other:             f.MapValue.Fields.Other.StringValue,
+	}
+}
+
+type VaccinationEvent struct {
+	MapValue struct {
+		Fields struct {
+			DateOfMostRecentShot struct {
+				TimestampValue string `json:"timestampValue"`
+			} `json:"dateOfMostRecentShot"`
+			Name struct {
+				StringValue string `json:"stringValue"`
+			} `json:"name"`
+			NumberOfShots struct {
+				IntegerValue string `json:"integerValue"`
+			} `json:"numberOfShots"`
+		} `json:"fields"`
+	} `json:"mapValue"`
+}
+
+func (v *VaccinationEvent) ToVaccination() Vaccination {
+	shots, err := strconv.Atoi(v.MapValue.Fields.NumberOfShots.IntegerValue)
+	if err != nil {
+		shots = 0
+	}
+	dateShot, err := time.Parse("2006-01-02", v.MapValue.Fields.DateOfMostRecentShot.TimestampValue)
+	if err != nil {
+		dateShot = time.Now()
+	}
+	return Vaccination{
+		Name:                 v.MapValue.Fields.Name.StringValue,
+		NumberOfShots:        shots,
+		DateOfMostRecentShot: dateShot,
+	}
+}
+
+type EditorEvent struct {
+	MapValue struct {
+		Fields struct {
+			Email struct {
+				StringValue string `json:"stringValue"`
+			} `json:"email"`
+			ID struct {
+				StringValue string `json:"stringValue"`
+			} `json:"id"`
+		} `json:"fields"`
+	} `json:"mapValue"`
+}
+
+func (e *EditorEvent) ToEditor() Editor {
+	return Editor{
+		Email: e.MapValue.Fields.Email.StringValue,
+		ID:    e.MapValue.Fields.ID.StringValue,
+	}
+}
+
 // FirestoreScreenings is how the screenings are represented in a Firestore event
 type FirestoreScreenings struct {
 	Comments struct {
 		StringValue string `json:"stringValue"`
 	} `json:"comments"`
-	CreatedBy struct {
-		MapValue struct {
-			Fields struct {
-				Email struct {
-					StringValue string `json:"stringValue"`
-				} `json:"email"`
-				ID struct {
-					StringValue string `json:"stringValue"`
-				} `json:"id"`
-			} `json:"fields"`
-		} `json:"mapValue"`
-	} `json:"createdBy"`
+	CreatedBy            EditorEvent `json:"createdBy"`
 	DiagnosedWithCovid19 struct {
 		BooleanValue bool `json:"booleanValue"`
 	} `json:"diagnosedWithCovid19"`
-	FluLikeSymptoms struct {
-		MapValue struct {
-			Fields struct {
-				AbdominalPain struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"abdominalPain"`
-				Aguesia struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"aguesia"`
-				Anosmia struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"anosmia"`
-				Bleeding struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"bleeding"`
-				BlurredVision struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"blurredVision"`
-				BreathDifficulty struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"breathDifficulty"`
-				BreathShort struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"breathShort"`
-				Chills struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"chills"`
-				Cough struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"cough"`
-				Diarrhea struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"diarrhea"`
-				EyeFacialPain struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"eyeFacialPain"`
-				Fever struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"fever"`
-				GeneralizedRash struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"generalizedRash"`
-				Headache struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"headache"`
-				JointMusclePain struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"jointMusclePain"`
-				Malaise struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"malaise"`
-				Nausea struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"nausea"`
-				Other struct {
-					StringValue string `json:"stringValue"`
-				} `json:"other"`
-				RunnyNose struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"runnyNose"`
-				ShortnessOfBreath struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"shortnessOfBreath"`
-				SoreThroat struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"soreThroat"`
-				Vomiting struct {
-					BooleanValue bool `json:"booleanValue"`
-				} `json:"vomiting"`
-			} `json:"fields"`
-		} `json:"mapValue"`
-	} `json:"fluLikeSymptoms"`
-	ID struct {
+	FluLikeSymptoms FluLikeSymptomsEvent `json:"fluLikeSymptoms"`
+	ID              struct {
 		StringValue string `json:"stringValue"`
 	} `json:"id"`
 	Location struct {
@@ -151,19 +224,8 @@ type FirestoreScreenings struct {
 	Modified struct {
 		TimestampValue string `json:"timestampValue"`
 	} `json:"modified"`
-	ModifiedBy struct {
-		MapValue struct {
-			Fields struct {
-				Email struct {
-					StringValue string `json:"stringValue"`
-				} `json:"email"`
-				ID struct {
-					StringValue string `json:"stringValue"`
-				} `json:"id"`
-			} `json:"fields"`
-		} `json:"mapValue"`
-	} `json:"modifiedBy"`
-	Screened struct {
+	ModifiedBy EditorEvent `json:"modifiedBy"`
+	Screened   struct {
 		TimestampValue string `json:"timestampValue"`
 	} `json:"screened"`
 	Temperature struct {
@@ -172,21 +234,32 @@ type FirestoreScreenings struct {
 	TookPcrTestInPast72Hours struct {
 		BooleanValue bool `json:"booleanValue"`
 	} `json:"tookPcrTestInPast72Hours"`
-	Vaccination struct {
-		MapValue struct {
-			Fields struct {
-				DateOfMostRecentShot struct {
-					TimestampValue string `json:"timestampValue"`
-				} `json:"dateOfMostRecentShot"`
-				Name struct {
-					StringValue string `json:"stringValue"`
-				} `json:"name"`
-				NumberOfShots struct {
-					IntegerValue string `json:"integerValue"`
-				} `json:"numberOfShots"`
-			} `json:"fields"`
-		} `json:"mapValue"`
-	} `json:"vaccination"`
+	Vaccination VaccinationEvent `json:"vaccination"`
+}
+
+func (f *FirestoreScreenings) ToScreening() Screening {
+	dateScreened, err := time.Parse("2006-01-02", f.Screened.TimestampValue)
+	if err != nil {
+		dateScreened = time.Now()
+	}
+	temperature, tempErr := strconv.ParseFloat(f.Temperature.IntegerValue, 32)
+	if tempErr != nil {
+		temperature = 0.0
+	}
+	return Screening{
+		ID:                       f.ID.StringValue,
+		DiagnosedWithCovid19:     f.DiagnosedWithCovid19.BooleanValue,
+		Comments:                 f.Comments.StringValue,
+		Location:                 f.Location.StringValue,
+		DateScreened:             dateScreened,
+		Temperature:              float32(temperature),
+		FluLikeSymptoms:          f.FluLikeSymptoms.ToFluLikeSymptoms(),
+		TookPcrTestInPast72Hours: f.TookPcrTestInPast72Hours.BooleanValue,
+		Vaccination:              f.Vaccination.ToVaccination(),
+		Modified:                 nil,
+		CreatedBy:                Editor{},
+		ModifiedBy:               Editor{},
+	}
 }
 
 // ArrivalFirestoreFields is how the arrivals are represented in a Firestore event
