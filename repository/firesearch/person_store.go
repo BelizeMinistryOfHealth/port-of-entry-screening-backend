@@ -41,6 +41,16 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 					Value: person.OtherTravelDocumentID,
 					Store: true,
 				},
+				{
+					Key:   "year",
+					Value: fmt.Sprintf("%d", person.Created.Year()),
+					Store: true,
+				},
+				{
+					Key:   "month",
+					Value: fmt.Sprintf("%d", person.Created.Month()),
+					Store: true,
+				},
 			},
 			Fields: []firesearch.Field{
 				{
@@ -70,6 +80,14 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 				{
 					Key:   "occupation",
 					Value: person.Occupation,
+				},
+				{
+					Key:   "created",
+					Value: person.Created,
+				},
+				{
+					Key:   "day",
+					Value: person.Created.Day(),
 				},
 			},
 		},

@@ -269,7 +269,7 @@ func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.Ar
 		abdominalPain = yes
 	}
 	var typeOfTraveller = "Non-Tourist"
-	if purposeOfTrip == "Vacation" {
+	if strings.ToLower(purposeOfTrip) == "tourist" {
 		typeOfTraveller = "Tourist"
 	}
 
@@ -404,17 +404,6 @@ type GodataCaseArg struct {
 	VisualId     string
 }
 
-func isTourist(purposeOfTrip string) bool {
-	nonTouristTypes := []string{"Local", "Resident", "National"}
-
-	for _, a := range nonTouristTypes {
-		if a == strings.ToLower(purposeOfTrip) {
-			return true
-		}
-	}
-	return false
-}
-
 func UpdateGoDataCase(args GodataCaseArg, caseId string, opts Options) error {
 	screening := args.Screening
 	personalInfo := args.PersonalInfo
@@ -422,7 +411,7 @@ func UpdateGoDataCase(args GodataCaseArg, caseId string, opts Options) error {
 	visualID := args.VisualId
 	address := eventToGoDataAddress(args.Address, personalInfo.PhoneNumbers, arrivalInfo.DateOfArrival)
 	var caseType = "Non-Tourist"
-	if isTourist(arrivalInfo.PurposeOfTrip) {
+	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
 		caseType = "Tourist"
 	}
 
@@ -443,7 +432,7 @@ func PushToGoData(args GodataCaseArg, opts Options) error {
 	visualId := args.VisualId
 	address := eventToGoDataAddress(args.Address, personalInfo.PhoneNumbers, arrivalInfo.DateOfArrival)
 	var caseType = "Non-Tourist"
-	if isTourist(arrivalInfo.PurposeOfTrip) {
+	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
 		caseType = "Tourist"
 	}
 	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType, arrivalInfo.PurposeOfTrip)

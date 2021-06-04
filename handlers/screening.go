@@ -8,7 +8,13 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"strings"
 )
+
+func hyphenateString(s string) string {
+	split := strings.Split(s, " ")
+	return strings.Join(split, "-")
+}
 
 func ScreeningEventHandler(
 	ctx context.Context,
@@ -41,16 +47,18 @@ func ScreeningEventHandler(
 	if tokenErr != nil {
 		return fmt.Errorf("failed to retrieve godata token: %w", tokenErr)
 	}
-	caseID, err := godata.GetCaseByVisualId(screening.ID, godata.Options{
+	ID := fmt.Sprintf("%s#%s", hyphenateString(arrivalInfo.PortOfEntry), personalInfo.ID)
+	caseID, err := godata.GetCaseByVisualId(ID, godata.Options{
 		Url:   godataURL,
 		Token: godataToken,
 	})
+
 	arg := godata.GodataCaseArg{
 		PersonalInfo: personalInfo,
 		Screening:    screening,
 		ArrivalInfo:  arrivalInfo,
 		Address:      address,
-		VisualId:     personalInfo.ID,
+		VisualId:     ID,
 	}
 	if err != nil {
 		// PUT

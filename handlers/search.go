@@ -16,6 +16,7 @@ type accessKeyResponse struct {
 
 // AccessKeyHandler returns a firesearch access key
 func AccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *http.Request) {
+	// get an idtoken.
 	err := auth.JwtMiddleware(db, r)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -25,12 +26,17 @@ func AccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
 	ctx := r.Context()
+	log.Info("Creating Firesearch service...")
 	firesearchService := firesearch2.CreateFiresearchService(
 		"Persons Index",
 		"persons_index",
 		"PGIA")
+	log.Info("retrieving access key")
 	accessKeyService := firesearch.NewAccessKeyService(firesearchService.Client)
 	keyReq := firesearch.GenerateKeyRequest{IndexPathPrefix: "firesearch/indexes/persons_index"}
+	log.WithFields(log.Fields{
+		"keyReq": keyReq,
+	}).Info("Generating Access Key")
 	keyResp, err := accessKeyService.GenerateKey(ctx, keyReq)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -41,22 +47,5 @@ func AccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *http.Request) {
 	}
 	accessKey := keyResp.AccessKey
 	json.NewEncoder(w).Encode(accessKeyResponse{AccessKey: accessKey})
-
-	//results, searchErr := personStore.SearchByName(ctx, accessKey, "", "")
-	//if searchErr != nil {
-	//	log.WithFields(log.Fields{
-	//		"handler": "AccessKeyHandler",
-	//		"message": "searching for person by name failed",
-	//	}).WithError(searchErr)
-	//	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	//}
-	//
-	//if jsonErr := json.NewEncoder(w).Encode(results); jsonErr != nil {
-	//	log.WithFields(log.Fields{
-	//		"handler": "AccessKeyHandler",
-	//		"message": "encoding search results failed",
-	//	}).WithError(jsonErr)
-	//	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	//}
 
 }
