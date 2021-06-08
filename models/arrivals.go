@@ -4,10 +4,14 @@ import "time"
 
 // AddressInBelize is the address that the person is residing within Belize
 type AddressInBelize struct {
-	ID                string  `json:"id" firestore:"id"`
-	Address           Address `json:"address" firestore:"address"`
-	ControlID         string  `json:"controlId" firestore:"controlId"`
-	AccommodationName string  `json:"accommodationName" firestore:"accommodationName"`
+	ID                string     `json:"id" firestore:"id"`
+	Address           Address    `json:"address" firestore:"address"`
+	ControlID         string     `json:"controlId" firestore:"controlId"`
+	AccommodationName string     `json:"accommodationName" firestore:"accommodationName"`
+	Modified          *time.Time `json:"modified,omitempty" firestore:"modified"`
+	CreatedBy         Editor     `json:"createdBy" firestore:"createdBy"`
+	ModifiedBy        Editor     `json:"modifiedBy" firestore:"modifiedBy"`
+	Created           *time.Time `json:"created" firestore:"created"`
 }
 
 // Community represents a community in a district within Belize
@@ -26,18 +30,22 @@ type Address struct {
 // ArrivalInfo contains information specific to an arrival, including port of embarkation and
 // vessel information
 type ArrivalInfo struct {
-	ID                       string    `json:"id" firestore:"id"`
-	DateOfArrival            time.Time `json:"dateOfArrival" firestore:"dateOfArrival"`
-	ModeOfTravel             string    `json:"modeOfTravel" firestore:"modeOfTravel"`
-	VesselNumber             string    `json:"vesselNumber" firestore:"vesselNumber"`
-	CountryOfEmbarkation     string    `json:"countryOfEmbarkation" firestore:"countryOfEmbarkation"`
-	DateOfEmbarkation        time.Time `json:"dateOfEmbarkation" firestore:"dateOfEmbarkation"`
-	PortOfEntry              string    `json:"portOfEntry" firestore:"portOfEntry"`
-	TravelOrigin             string    `json:"travelOrigin" firestore:"travelOrigin"`
-	CountriesVisited         string    `json:"countriesVisited" firestore:"countriesVisited"`
-	PurposeOfTrip            string    `json:"purposeOfTrip" firestore:"purposeOfTrip"`
-	ContactPerson            string    `json:"contactPerson" firestore:"contactPerson"`
-	ContactPersonPhoneNumber string    `json:"contactPersonPhoneNumber" firestore:"contactPersonPhoneNumber"`
+	ID                       string     `json:"id" firestore:"id"`
+	DateOfArrival            time.Time  `json:"dateOfArrival" firestore:"dateOfArrival"`
+	ModeOfTravel             string     `json:"modeOfTravel" firestore:"modeOfTravel"`
+	VesselNumber             string     `json:"vesselNumber" firestore:"vesselNumber"`
+	CountryOfEmbarkation     string     `json:"countryOfEmbarkation" firestore:"countryOfEmbarkation"`
+	DateOfEmbarkation        time.Time  `json:"dateOfEmbarkation" firestore:"dateOfEmbarkation"`
+	PortOfEntry              string     `json:"portOfEntry" firestore:"portOfEntry"`
+	TravelOrigin             string     `json:"travelOrigin" firestore:"travelOrigin"`
+	CountriesVisited         string     `json:"countriesVisited" firestore:"countriesVisited"`
+	PurposeOfTrip            string     `json:"purposeOfTrip" firestore:"purposeOfTrip"`
+	ContactPerson            string     `json:"contactPerson" firestore:"contactPerson"`
+	ContactPersonPhoneNumber string     `json:"contactPersonPhoneNumber" firestore:"contactPersonPhoneNumber"`
+	Modified                 *time.Time `json:"modified,omitempty" firestore:"modified"`
+	CreatedBy                Editor     `json:"createdBy" firestore:"createdBy"`
+	ModifiedBy               Editor     `json:"modifiedBy" firestore:"modifiedBy"`
+	Created                  *time.Time `json:"created" firestore:"created"`
 }
 
 /// Screening Structs

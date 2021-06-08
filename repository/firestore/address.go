@@ -41,3 +41,11 @@ func (p *AddressStoreService) GetByID(ctx context.Context, ID string) (models.Ad
 	}
 	return address, nil
 }
+
+func (s *AddressStoreService) CreateAddress(ctx context.Context, address models.AddressInBelize) error {
+	_, err := s.colRef.Doc(address.ID).Set(ctx, address)
+	if err != nil {
+		return fmt.Errorf("AddressStoreService.CreateAddress: failed: %w", err)
+	}
+	return nil
+}

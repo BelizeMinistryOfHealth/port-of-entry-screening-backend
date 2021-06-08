@@ -39,3 +39,11 @@ func (p *ArrivalsStoreService) GetByID(ctx context.Context, ID string) (models.A
 	}
 	return arrival, nil
 }
+
+func (s *ArrivalsStoreService) CreateArrival(ctx context.Context, arrival models.ArrivalInfo) error {
+	_, err := s.colRef.Doc(arrival.ID).Set(ctx, arrival)
+	if err != nil {
+		return fmt.Errorf("ArrivalStoreService.CreateArrival: failed: %w", err)
+	}
+	return nil
+}

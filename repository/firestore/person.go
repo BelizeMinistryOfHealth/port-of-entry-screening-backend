@@ -25,7 +25,7 @@ func CreatePersonService(db *DB, collection string) *PersonStoreService {
 }
 
 // CreatePerson inserts a new person to the database
-func (p *PersonStoreService) CreatePerson(ctx context.Context, person models.Person) error {
+func (p *PersonStoreService) CreatePerson(ctx context.Context, person models.PersonalInfo) error {
 	_, err := p.colRef.Doc(person.ID).Set(ctx, person)
 	if err != nil {
 		return fmt.Errorf("PersonStoreService.CreatePerson: failed: %w", err)

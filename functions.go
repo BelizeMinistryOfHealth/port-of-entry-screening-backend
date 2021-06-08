@@ -27,6 +27,17 @@ func init() {
 	personFiresearchService = firesearch.CreateFiresearchService("Persons Index", "persons_index", "NA")
 }
 
+func enableCors() Middleware {
+	return func(f http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Referer, Connection")
+			f(w, r)
+		}
+	}
+}
+
 // HandlerEcho is an echo endpoint for testing purposes
 func HandlerEcho(w http.ResponseWriter, _ *http.Request) {
 	_, err := w.Write([]byte("hello"))
@@ -142,6 +153,33 @@ func AccessKeyFn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 	handlers.AccessKeyHandler(*firestoreDb, w, r)
+}
+
+// RegistrationFn is the REST endpoint for registering a traveller
+func RegistrationFn(w http.ResponseWriter, r *http.Request) {
+	middleware := enableCors()
+	middleware(registrationFn)
+}
+
+func registrationFn(w http.ResponseWriter, r *http.Request) {
+	projectID := os.Getenv("PROJECT_ID")
+	firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"handler": "AccessKeyFn",
+			"message": "error creating firestore db connection",
+		}).WithError(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+	personStoreService := firestore.CreatePersonService(firestoreDb, "persons")
+	addressStoreService := firestore.CreateAddressStoreService(firestoreDb, "addresses")
+	arrivalStoreService := firestore.CreateArrivalsStoreService(firestoreDb, "arrivals")
+	args := handlers.RegistrationArgs{
+		PersonStoreService:  personStoreService,
+		ArrivalStoreService: arrivalStoreService,
+		AddressStoreService: addressStoreService,
+	}
+	handlers.RegistrationHandler(args, w, r)
 }
 
 // GetServer exposes Server to modify some settings
