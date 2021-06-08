@@ -33,6 +33,7 @@ func enableCors() Middleware {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Referer, Connection")
+			w.Header().Set("responseType", "*")
 			f(w, r)
 		}
 	}
@@ -157,29 +158,37 @@ func AccessKeyFn(w http.ResponseWriter, r *http.Request) {
 
 // RegistrationFn is the REST endpoint for registering a traveller
 func RegistrationFn(w http.ResponseWriter, r *http.Request) {
-	middleware := enableCors()
-	middleware(registrationFn)
+	//authMid := NewChain(enableCors())
+	//authMid.Then(registrationFn)(w, r)
+	//w.Header().Set("Access-Control-Allow-Origin", "*")
+	//w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	//w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Referer, Connection")
+	Chainz(registrationFn, enableCors())(w, r)
+	//registrationFn(w, r)
+
 }
 
 func registrationFn(w http.ResponseWriter, r *http.Request) {
-	projectID := os.Getenv("PROJECT_ID")
-	firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"handler": "AccessKeyFn",
-			"message": "error creating firestore db connection",
-		}).WithError(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if r.Method == http.MethodPost {
+		projectID := os.Getenv("PROJECT_ID")
+		firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"handler": "AccessKeyFn",
+				"message": "error creating firestore db connection",
+			}).WithError(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		personStoreService := firestore.CreatePersonService(firestoreDb, "persons")
+		addressStoreService := firestore.CreateAddressStoreService(firestoreDb, "addresses")
+		arrivalStoreService := firestore.CreateArrivalsStoreService(firestoreDb, "arrivals")
+		args := handlers.RegistrationArgs{
+			PersonStoreService:  personStoreService,
+			ArrivalStoreService: arrivalStoreService,
+			AddressStoreService: addressStoreService,
+		}
+		handlers.RegistrationHandler(args, w, r)
 	}
-	personStoreService := firestore.CreatePersonService(firestoreDb, "persons")
-	addressStoreService := firestore.CreateAddressStoreService(firestoreDb, "addresses")
-	arrivalStoreService := firestore.CreateArrivalsStoreService(firestoreDb, "arrivals")
-	args := handlers.RegistrationArgs{
-		PersonStoreService:  personStoreService,
-		ArrivalStoreService: arrivalStoreService,
-		AddressStoreService: addressStoreService,
-	}
-	handlers.RegistrationHandler(args, w, r)
 }
 
 // GetServer exposes Server to modify some settings

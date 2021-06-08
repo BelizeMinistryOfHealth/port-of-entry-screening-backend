@@ -28,7 +28,7 @@ func RegistrationHandler(args RegistrationArgs, w http.ResponseWriter, r *http.R
 	var req RegistrationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.WithFields(log.Fields{
-			"request": req,
+			"request": r.Body,
 		}).WithError(err).Error("RegistrationHandler(): decoding failed")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

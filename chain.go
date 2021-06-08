@@ -22,6 +22,14 @@ func NewChain(middlewares ...Middleware) Chain {
 	return Chain{append(([]Middleware)(nil), middlewares...)}
 }
 
+// Chainz applies middlewares to a http.HandlerFunc
+func Chainz(f http.HandlerFunc, middlewares ...Middleware) http.HandlerFunc {
+	for _, m := range middlewares {
+		f = m(f)
+	}
+	return f
+}
+
 // Then chains the middleware and returns the final http.HandlerFunc.
 // A chain can be safely reused by calling Then() several times.
 func (c Chain) Then(h http.HandlerFunc) http.HandlerFunc {

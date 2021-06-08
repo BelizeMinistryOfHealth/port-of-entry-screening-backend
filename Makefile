@@ -87,7 +87,7 @@ deleteStagingScreeningUpdatedListener:
 	gcloud functions delete ScreeningUpdatedListener
 
 deployStagingRegistration:
-	gcloud alpha functions deploy RegistrationFn --entry-point RegistrationFn --runtime go113 --trigger-http --env-vars-file env.yaml --region us-east1 --allow-unauthenticated --security-level secure-always --source .
+	gcloud alpha functions deploy RegistrationFn --entry-point RegistrationFn --runtime go113 --trigger-http --env-vars-file env.staging.yaml --region us-east1 --allow-unauthenticated --security-level secure-always --source .
 
 deleteStagingRegistration:
 	gcloud functions delete RegistrationFn

@@ -132,10 +132,10 @@ type PersonalInfo struct {
 	BhisNumber            string    `json:"bhisNumber,omitempty" firestore:"bhisNumber"`
 	Occupation            string    `json:"occupation" firestore:"occupation"`
 	PortOfEntry           string    `json:"portOfEntry" firestore:"portOfEntry"`
-	Created               time.Time `json:"created" firestore:"created"`
+	Created               time.Time `json:"created,omitempty" firestore:"created"`
 	Modified              time.Time `json:"modified,omitempty" firestore:"modified"`
-	CreatedBy             Editor    `json:"createdBy" firestore:"createdBy"`
-	ModifiedBy            Editor    `json:"modifiedBy" firestore:"modifiedBy"`
+	CreatedBy             Editor    `json:"createdBy,omitempty" firestore:"createdBy"`
+	ModifiedBy            Editor    `json:"modifiedBy,omitempty" firestore:"modifiedBy"`
 }
 
 // TravellingCompanion links a person to a companion. These are usually under age persons travelling with an adult.
