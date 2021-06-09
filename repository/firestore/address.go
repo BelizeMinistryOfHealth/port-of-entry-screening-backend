@@ -49,3 +49,11 @@ func (s *AddressStoreService) CreateAddress(ctx context.Context, address models.
 	}
 	return nil
 }
+
+func (s *AddressStoreService) DeleteAddress(ctx context.Context, ID string) error {
+	_, err := s.colRef.Doc(ID).Delete(ctx)
+	if err != nil {
+		return fmt.Errorf("DeleteAddress failed: %w", err)
+	}
+	return nil
+}

@@ -47,3 +47,11 @@ func (s *ArrivalsStoreService) CreateArrival(ctx context.Context, arrival models
 	}
 	return nil
 }
+
+func (s *ArrivalsStoreService) DeleteArrival(ctx context.Context, ID string) error {
+	_, err := s.colRef.Doc(ID).Delete(ctx)
+	if err != nil {
+		return fmt.Errorf("DeleteArrival failed: %w", err)
+	}
+	return nil
+}

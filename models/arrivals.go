@@ -18,7 +18,7 @@ type AddressInBelize struct {
 type Community struct {
 	ID           string `json:"id" firestore:"id"`
 	District     string `json:"district" firestore:"district"`
-	Municipality string `json:"municipality" firestore:"municipality"`
+	Municipality string `json:"name" firestore:"name"`
 }
 
 // Address relates the street location or name to a community.

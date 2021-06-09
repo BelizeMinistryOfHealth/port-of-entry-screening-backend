@@ -266,59 +266,6 @@ func ToGender(g string) string {
 	return genderValue[1]
 }
 
-// ToPerson converts an SIB Arrival record to a record expected by POE
-func (s *Arrival) ToPerson() models.Person {
-	nationality := FindCountryByName(s.Nationality)
-	personID := s.GenerateID()
-	travelDate, _ := time.Parse(isoDateLayout, s.TravelDate)
-	dateCreated, _ := time.Parse(isoDateLayout, s.DateCreated)
-
-	person := models.Person{
-		ID: personID,
-		PersonalInfo: models.PersonalInfo{
-			FirstName:             s.FirstName,
-			LastName:              s.LastName,
-			MiddleName:            s.MiddleName,
-			FullName:              s.generateFullName(),
-			Dob:                   s.Dob,
-			Nationality:           nationality,
-			PassportNumber:        s.PassportNumber,
-			OtherTravelDocument:   "",
-			OtherTravelDocumentID: "",
-			Email:                 s.Email,
-			Gender:                ToGender(s.Gender),
-			PhoneNumbers:          s.PhoneNumber,
-			BhisNumber:            "",
-			Occupation:            s.Occupation,
-		},
-		Arrival: models.Arrival{
-			ArrivalInfo: models.ArrivalInfo{
-				DateOfArrival:        travelDate,
-				ModeOfTravel:         ToTravelMode(s.TravelMode),
-				VesselNumber:         s.VesselNumber,
-				CountryOfEmbarkation: FindCountryByName(s.TravelOrigin),
-				DateOfEmbarkation:    s.DateOfEmbarkation,
-				PortOfEntry:          ToPortOfEntry(s.PortOfEntry),
-				TravelOrigin:         s.CityAirport,
-				CountriesVisited:     s.CountryVisited,
-			},
-			//Addresses:                addresses,
-			Screenings:               nil,
-			TravellingCompanions:     nil,
-			ContactPerson:            s.ContactPerson,
-			ContactPersonPhoneNumber: s.ContactPersonNumber,
-			PurposeOfTrip:            PurposeOfTrip[s.PurposeOfTrip],
-			LengthStay:               s.LengthStay,
-			Created:                  dateCreated,
-			Modified:                 &dateCreated,
-		},
-		Created:     dateCreated,
-		Modified:    &dateCreated,
-		PortOfEntry: ToPortOfEntry(s.PortOfEntry),
-	}
-	return person
-}
-
 // PayloadItems represents the format of how the items are encoded in the TravellersData
 type PayloadItems struct {
 	ID        string    `json:"id"`

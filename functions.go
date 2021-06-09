@@ -91,7 +91,23 @@ func PersonDeletedListener(ctx context.Context, event models.FirestorePersonEven
 		Service: personFiresearchService,
 	}
 	personID := event.OldValue.Fields.ID.StringValue
-	if err := handlers.PersonDeleted(ctx, personStore, personID); err != nil {
+	projectID := os.Getenv("PROJECT_ID")
+	firestoreDb, err := firestore.CreateFirestoreDB(ctx, projectID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"handler": "AccessKeyFn",
+			"message": "error creating firestore db connection",
+		}).WithError(err)
+		return fmt.Errorf("PersonDeletedListener failed: %w", err)
+	}
+	addressStoreService := firestore.CreateAddressStoreService(firestoreDb, "addresses")
+	arrivalStoreService := firestore.CreateArrivalsStoreService(firestoreDb, "arrivals")
+	args := handlers.PersonDeletedArgs{
+		PersonFiresearchStore: personStore,
+		ArrivalStoreService:   arrivalStoreService,
+		AddressStoreService:   addressStoreService,
+	}
+	if err := handlers.PersonDeleted(ctx, args, personID); err != nil {
 		log.WithFields(log.Fields{
 			"event":    event,
 			"personID": personID,

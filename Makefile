@@ -36,7 +36,7 @@ deleteScreeningUpdatedListener:
 	gcloud functions delete ScreeningUpdatedListener
 
 deployRegistration:
-	gcloud alpha functions deploy RegistrationFn --entry-point RegistrationFn --runtime go113 --trigger-http --env-vars-file env.yaml us-east1 --allow-unauthenticated --security-level secure-always --source .
+	gcloud alpha functions deploy RegistrationFn --entry-point RegistrationFn --runtime go113 --trigger-http --env-vars-file env.yaml --region us-east1 --allow-unauthenticated --security-level secure-always --source .
 
 deleteRegistration:
 	gcloud functions delete RegistrationFn
@@ -57,7 +57,7 @@ deleteStagingPersonsHook:
 	gcloud functions delete PersonsHook
 
 deployStagingPersonDeletedListener:
-	gcloud functions deploy PersonDeletedListener --entry-point PersonDeletedListener --runtime go113 --trigger-event providers/cloud.firestore/eventTypes/document.delete  --region us-east1 --trigger-resource "projects/epi-belize-staging/databases/(default)/documents/persons/{pushId}" --source . --env-vars-file env.yaml
+	gcloud functions deploy PersonDeletedListener --entry-point PersonDeletedListener --runtime go113 --trigger-event providers/cloud.firestore/eventTypes/document.delete  --region us-east1 --trigger-resource "projects/epi-belize-staging/databases/(default)/documents/persons/{pushId}" --source . --env-vars-file env.staging.yaml
 
 deleteStagingPersonDeletedListener:
 	gcloud functions delete PersonDeletedListener
