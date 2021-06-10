@@ -160,28 +160,27 @@ func ScreeningListener(ctx context.Context, event models.FirestoreScreeningEvent
 
 // AccessKeyFn is the function that returns a firesearch access key
 func AccessKeyFn(w http.ResponseWriter, r *http.Request) {
-	projectID := os.Getenv("PROJECT_ID")
-	firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"handler": "AccessKeyFn",
-			"message": "error creating firestore db connection",
-		}).WithError(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	Chainz(accessKeyHandler, enableCors())(w, r)
+}
+
+func accessKeyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		projectID := os.Getenv("PROJECT_ID")
+		firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"handler": "AccessKeyFn",
+				"message": "error creating firestore db connection",
+			}).WithError(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		handlers.AccessKeyHandler(*firestoreDb, w, r)
 	}
-	handlers.AccessKeyHandler(*firestoreDb, w, r)
 }
 
 // RegistrationFn is the REST endpoint for registering a traveller
 func RegistrationFn(w http.ResponseWriter, r *http.Request) {
-	//authMid := NewChain(enableCors())
-	//authMid.Then(registrationFn)(w, r)
-	//w.Header().Set("Access-Control-Allow-Origin", "*")
-	//w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	//w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Referer, Connection")
 	Chainz(registrationFn, enableCors())(w, r)
-	//registrationFn(w, r)
-
 }
 
 func registrationFn(w http.ResponseWriter, r *http.Request) {
