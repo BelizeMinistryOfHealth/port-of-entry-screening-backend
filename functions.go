@@ -164,7 +164,7 @@ func AccessKeyFn(w http.ResponseWriter, r *http.Request) {
 }
 
 func accessKeyHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
+	if r.Method == http.MethodGet {
 		projectID := os.Getenv("PROJECT_ID")
 		firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
 		if err != nil {
