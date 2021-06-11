@@ -45,7 +45,7 @@ type goDataAuthResponse struct {
 // API is the GoData api
 type API interface {
 	GetCaseByVisualId(visualID string, opts Options) (CaseID, error)
-	UpdateCase(args CaseArg, caseId string, opts Options) error
+	UpdateCase(args CaseArg, caseID string, opts Options) error
 	CreateCase(args CaseArg, opts Options) error
 }
 
@@ -109,10 +109,10 @@ func (e *HTTPRequestErr) Unwrap() error {
 
 // GetCaseByVisualId retrieves a case from GoData that matches the visualId.
 // An error is returned if the http request fails or if no case is found.
-func (a *api) GetCaseByVisualId(visualId string, opts Options) (CaseID, error) {
+func (a *api) GetCaseByVisualId(visualID string, opts Options) (CaseID, error) {
 	token := opts.Token
 	// We need the id, so we should query for it.
-	filter := fmt.Sprintf("{\"where\":{\"visualId\":{\"regexp\":\"/^%s/i\"}}}", visualId)
+	filter := fmt.Sprintf("{\"where\":{\"visualID\":{\"regexp\":\"/^%s/i\"}}}", visualID)
 	getURL := fmt.Sprintf("%s/outbreaks/%s/cases?filter=%s&access_token=%s", a.baseURL, opts.OutbreakID, url.QueryEscape(filter), opts.Token)
 	getReq, _ := http.NewRequest(http.MethodGet, getURL, nil)
 	getReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
@@ -128,7 +128,7 @@ func (a *api) GetCaseByVisualId(visualId string, opts Options) (CaseID, error) {
 	log.WithFields(log.Fields{
 		"body":            getResp.Body,
 		"status":          getResp.Status,
-		"visualIdRequest": visualId,
+		"visualIdRequest": visualID,
 		"url":             getURL,
 	}).Info("retrieved visualID")
 
@@ -147,7 +147,7 @@ func (a *api) GetCaseByVisualId(visualId string, opts Options) (CaseID, error) {
 	if len(resps) == 0 {
 		return CaseID{}, &NoResultsErr{
 			Err: err,
-			Msg: fmt.Sprintf("no record found with visualID: %s", visualId),
+			Msg: fmt.Sprintf("no record found with visualID: %s", visualID),
 		}
 	}
 	return resps[0], nil
@@ -164,7 +164,7 @@ func newCase(args CaseArg) GoDataCase {
 		caseType = "Tourist"
 	}
 
-	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType)
+	goDataQuestionnaire := createGoDataQuestionnaire(personalInfo, screening, arrivalInfo, caseType)
 	return createGoDataCase(goDataQuestionnaire, []GoDataAddress{address}, personalInfo, visualID)
 }
 
@@ -313,7 +313,7 @@ func eventToGoDataAddress(bzAddress models.AddressInBelize, personalInfo models.
 	return address
 }
 
-func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.ArrivalInfo, caseType string) GoDataQuestionnaire {
+func createGoDataQuestionnaire(personalInfo models.PersonalInfo, screening models.Screening, arrivalInfo models.ArrivalInfo, caseType string) GoDataQuestionnaire {
 	var fever = "No"
 	if screening.FluLikeSymptoms.Fever {
 		fever = yes
@@ -502,6 +502,7 @@ func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.Ar
 			{Value: pcrTest},
 		},
 		PortOfEntry: []QuestionnaireAnswer{{Value: arrivalInfo.PortOfEntry}},
+		Nationality: []QuestionnaireAnswer{{Value: personalInfo.Nationality}},
 	}
 
 	return godataQuestionnaire

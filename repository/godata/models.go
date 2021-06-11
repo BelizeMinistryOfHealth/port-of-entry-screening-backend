@@ -170,6 +170,7 @@ type GoDataQuestionnaire struct {
 	FlightNumber                                  []QuestionnaireAnswer                           `json:"FA0_priorXdayexposure_flightnumber"`
 	PcrTestInPast72Hours                          []QuestionnaireAnswer                           `json:"FA0_priorXdayexposure_tookpcrtest_past72hours"`
 	PortOfEntry                                   []QuestionnaireAnswer                           `json:"port_of_entry"`
+	Nationality                                   []QuestionnaireAnswer                           `json:"nationality"`
 }
 
 type GoDataCase struct {
