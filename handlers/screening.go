@@ -17,6 +17,8 @@ func hyphenateString(s string) string {
 	return strings.Join(split, "-")
 }
 
+// ScreeningEventHandler is a handler that gets triggered when a screening record is created or modified.
+// It updates or creates a new GoData Record.
 func ScreeningEventHandler(
 	ctx context.Context,
 	event models.FirestoreScreeningEvent,

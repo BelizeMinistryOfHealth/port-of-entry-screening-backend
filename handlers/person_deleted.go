@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// PersonDeletedArgs are the arguments for deleting a person
 type PersonDeletedArgs struct {
 	PersonFiresearchStore firesearch.PersonStore
 	ArrivalStoreService   *firestore.ArrivalsStoreService
