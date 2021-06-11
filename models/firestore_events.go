@@ -126,6 +126,7 @@ type FluLikeSymptomsEvent struct {
 	} `json:"mapValue"`
 }
 
+// ToFluLikeSymptoms converts an event structure to the FluLikeSymptoms domain structure.
 func (f *FluLikeSymptomsEvent) ToFluLikeSymptoms() FluLikeSymptoms {
 	return FluLikeSymptoms{
 		Fever:             f.MapValue.Fields.Fever.BooleanValue,
@@ -153,6 +154,7 @@ func (f *FluLikeSymptomsEvent) ToFluLikeSymptoms() FluLikeSymptoms {
 	}
 }
 
+// VaccinationEvent represents the vaccination value in a Firestore event
 type VaccinationEvent struct {
 	MapValue struct {
 		Fields struct {
@@ -169,6 +171,7 @@ type VaccinationEvent struct {
 	} `json:"mapValue"`
 }
 
+// ToVaccination converts a vaccination representation in an event to a Vaccination domain model
 func (v *VaccinationEvent) ToVaccination() Vaccination {
 	shots, err := strconv.Atoi(v.MapValue.Fields.NumberOfShots.IntegerValue)
 	if err != nil {
@@ -185,6 +188,7 @@ func (v *VaccinationEvent) ToVaccination() Vaccination {
 	}
 }
 
+// EditorEvent represents the editor's data in a firestore event
 type EditorEvent struct {
 	MapValue struct {
 		Fields struct {
@@ -198,6 +202,7 @@ type EditorEvent struct {
 	} `json:"mapValue"`
 }
 
+// ToEditor converts the editor structure in a firestore event to the domain Editor model
 func (e *EditorEvent) ToEditor() Editor {
 	return Editor{
 		Email: e.MapValue.Fields.Email.StringValue,
@@ -237,6 +242,7 @@ type FirestoreScreenings struct {
 	Vaccination VaccinationEvent `json:"vaccination"`
 }
 
+// ToScreening converts the screening value in a firestore event to the Screening domain model
 func (f *FirestoreScreenings) ToScreening() Screening {
 	dateScreened, err := time.Parse("2006-01-02", f.Screened.TimestampValue)
 	if err != nil {
@@ -411,14 +417,17 @@ type FirestoreArrivalValue struct {
 	UpdateTime time.Time              `json:"updateTime"`
 }
 
+// StringValueStruct represents a string value in a Firestore Event
 type StringValueStruct struct {
 	StringValue string `json:"stringValue"`
 }
 
+// TimestampValueStruct represents a time value in a Firestore event
 type TimestampValueStruct struct {
 	TimestampValue time.Time `json:"timestampValue"`
 }
 
+// PersonFirestoreFields represents the person value in a firestore event
 type PersonFirestoreFields struct {
 	ID                    StringValueStruct `json:"id"`
 	FirstName             StringValueStruct `json:"firstName"`
@@ -455,6 +464,7 @@ type PersonFirestoreFields struct {
 	Modified TimestampValueStruct `json:"modified"`
 }
 
+// ToPerson converts the person value in a firestore event to a PersonalInfo domain model
 func (p *PersonFirestoreFields) ToPerson() PersonalInfo {
 	return PersonalInfo{
 		ID:                    p.ID.StringValue,
@@ -485,6 +495,7 @@ func (p *PersonFirestoreFields) ToPerson() PersonalInfo {
 	}
 }
 
+// FirestorePersonEvent represents a Firestore Event
 type FirestorePersonEvent struct {
 	OldValue   FirestorePersonValue `json:"oldValue"`
 	Value      FirestorePersonValue `json:"value"`
@@ -493,6 +504,7 @@ type FirestorePersonEvent struct {
 	} `json:"updateMask"`
 }
 
+// FirestorePersonValue represents the value in a firestore event
 type FirestorePersonValue struct {
 	CreateTime time.Time             `json:"createTime"`
 	Fields     PersonFirestoreFields `json:"fields"`
@@ -500,6 +512,7 @@ type FirestorePersonValue struct {
 	UpdateTime time.Time             `json:"updateTime"`
 }
 
+// FirestoreScreeningEvent represents a Screening Firestore event
 type FirestoreScreeningEvent struct {
 	OldValue   FirestoreScreeningValue `json:"oldValue"`
 	Value      FirestoreScreeningValue `json:"value"`
@@ -508,6 +521,7 @@ type FirestoreScreeningEvent struct {
 	} `json:"updateMask"`
 }
 
+// FirestoreScreeningValue represents a value in a Screening Firestore event
 type FirestoreScreeningValue struct {
 	CreateTime time.Time           `json:"createTime"`
 	Fields     FirestoreScreenings `json:"fields"`
