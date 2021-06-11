@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -48,10 +49,17 @@ func ScreeningEventHandler(
 		return fmt.Errorf("failed to retrieve godata token: %w", tokenErr)
 	}
 	ID := fmt.Sprintf("%s#%s", hyphenateString(arrivalInfo.PortOfEntry), personalInfo.ID)
-	caseID, err := godata.GetCaseByVisualId(ID, godata.Options{
-		Url:   godataURL,
+	httpClient := http.Client{}
+	goAPi := godata.NewApi(godataURL, &httpClient)
+	caseID, err := goAPi.GetCaseByVisualId(ID, godata.Options{
+		URL:   godataURL,
 		Token: godataToken,
 	})
+
+	log.WithFields(log.Fields{
+		"ID":     ID,
+		"CaseID": caseID,
+	}).Info("Retrieved godata case")
 
 	arg := godata.GodataCaseArg{
 		PersonalInfo: personalInfo,
@@ -60,12 +68,12 @@ func ScreeningEventHandler(
 		Address:      address,
 		VisualId:     ID,
 	}
-	if err != nil {
+	if err != nil || len(caseID.ID) > 0 {
 		// PUT
 		if err := godata.UpdateGoDataCase(arg, caseID.ID, godata.Options{
-			Url:        godataURL,
+			URL:        godataURL,
 			Token:      godataToken,
-			OutbreakId: outbreakID,
+			OutbreakID: outbreakID,
 		}); err != nil {
 			log.WithFields(log.Fields{
 				"screening":    screening,
@@ -77,7 +85,7 @@ func ScreeningEventHandler(
 	}
 
 	if err := godata.PushToGoData(arg,
-		godata.Options{Url: godataURL, Token: godataToken, OutbreakId: outbreakID}); err != nil {
+		godata.Options{URL: godataURL, Token: godataToken, OutbreakID: outbreakID}); err != nil {
 		log.WithFields(log.Fields{
 			"screening":    screening,
 			"personalInfo": personalInfo,

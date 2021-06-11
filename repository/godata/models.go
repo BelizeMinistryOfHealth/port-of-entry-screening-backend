@@ -12,6 +12,7 @@ type GoDataAddress struct {
 	Date         string `json:"date"`
 	PhoneNumber  string `json:"phoneNumber"`
 	LocationId   string `json:"locationId"`
+	Email        string `json:"emailAddress"`
 }
 
 type GeoLocation struct {

@@ -19,9 +19,9 @@ const yes = "Yes"
 type Options struct {
 	Username   string
 	Password   string
-	Url        string
+	URL        string
 	Token      string
-	OutbreakId string
+	OutbreakID string
 }
 
 // CaseID Verify if a GoData record exists by fetching
@@ -31,6 +31,114 @@ type CaseID struct {
 
 type goDataAuthResponse struct {
 	AccessToken string `json:"access_token"`
+}
+
+// API is the GoData api
+type API interface {
+	GetCaseByVisualId(visualID string, opts Options) (CaseID, error)
+}
+
+type api struct {
+	Client  *http.Client
+	baseURL string
+}
+
+// NewApi creates a new GoData API
+func NewApi(baseURL string, httpClient *http.Client) API {
+	return &api{
+		Client:  httpClient,
+		baseURL: baseURL,
+	}
+}
+
+// NoResultsErr is error returned from making an http request to GoData
+type NoResultsErr struct {
+	Err error
+	Msg string
+}
+
+func (e *NoResultsErr) Error() string {
+	return e.Msg
+}
+
+// Unwrap unwraps the error
+func (e *NoResultsErr) Unwrap() error {
+	return e.Err
+}
+
+// DecodeErr happens when decoding an http response fails
+type DecodeErr struct {
+	Err error
+	Msg string
+}
+
+func (e *DecodeErr) Error() string {
+	return e.Msg
+}
+
+// Unwrap unwraps the error
+func (e *DecodeErr) Unwrap() error {
+	return e.Err
+}
+
+// HTTPRequestErr is any http error
+type HTTPRequestErr struct {
+	Err error
+	Msg string
+}
+
+func (e *HTTPRequestErr) Error() string {
+	return e.Msg
+}
+
+func (e *HTTPRequestErr) Unwrap() error {
+	return e.Err
+}
+
+// GetCaseByVisualId retrieves a case from GoData that matches the visualId.
+// An error is returned if the http request fails or if no case is found.
+func (a *api) GetCaseByVisualId(visualId string, opts Options) (CaseID, error) {
+	token := opts.Token
+	// We need the id, so we should query for it.
+	filter := fmt.Sprintf("{\"where\":{\"visualId\":{\"regexp\":\"/^%s/i\"}}}", visualId)
+	getURL := fmt.Sprintf("%s/outbreaks/%s/cases?filter=%s&access_token=%s", a.baseURL, opts.OutbreakID, url.QueryEscape(filter), opts.Token)
+	getReq, _ := http.NewRequest(http.MethodGet, getURL, nil)
+	getReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	getReq.Header.Set("Content-Type", "application/json")
+	getResp, err := a.Client.Do(getReq)
+	if err != nil {
+		return CaseID{}, &HTTPRequestErr{
+			Err: err,
+			Msg: "could not retrieve case from GoData",
+		}
+	}
+	defer getResp.Body.Close() //nolint:errcheck
+	log.WithFields(log.Fields{
+		"body":            getResp.Body,
+		"status":          getResp.Status,
+		"visualIdRequest": visualId,
+		"url":             getURL,
+	}).Info("retrieved visualID")
+
+	var resps []CaseID
+	if decodeErr := json.NewDecoder(getResp.Body).Decode(&resps); decodeErr != nil {
+		log.WithFields(log.Fields{
+			"body":   getResp.Body,
+			"status": getResp.Status,
+		}).WithError(decodeErr).Info("godata case raw body")
+
+		return CaseID{}, &DecodeErr{
+			Err: decodeErr,
+			Msg: "failed to decode case data",
+		}
+	}
+	if len(resps) == 0 {
+		return CaseID{}, &NoResultsErr{
+			Err: err,
+			Msg: fmt.Sprintf("no record found with visualID: %s", visualId),
+		}
+	}
+	return resps[0], nil
 }
 
 // GetGodataToken retrieves a JWT token from a GoData Server.
@@ -58,7 +166,7 @@ func GetGodataToken(username, password, baseUrl string) (string, error) {
 func postToGodata(godataCase GoDataCase, opts Options) (*http.Response, error) {
 
 	token := opts.Token
-	outbreakId := opts.OutbreakId
+	outbreakId := opts.OutbreakID
 
 	// Prepare post request to create case
 	body, err := json.Marshal(godataCase)
@@ -68,7 +176,7 @@ func postToGodata(godataCase GoDataCase, opts Options) (*http.Response, error) {
 	}
 
 	client := &http.Client{}
-	newReq, _ := http.NewRequest("POST", fmt.Sprintf("%s/outbreaks/%s/cases", opts.Url, outbreakId), bytes.NewReader(body))
+	newReq, _ := http.NewRequest("POST", fmt.Sprintf("%s/outbreaks/%s/cases", opts.URL, outbreakId), bytes.NewReader(body))
 	newReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	newReq.Header.Set("Content-Type", "application/json")
 	log.WithFields(log.Fields{
@@ -121,7 +229,7 @@ func PutCase(o GoDataCase, caseID string, opts Options) error {
 		return fmt.Errorf("failed to marshal godata case: %w", err)
 	}
 
-	req, _ := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/%s", opts.Url, caseID), bytes.NewReader(body))
+	req, _ := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/%s", opts.URL, caseID), bytes.NewReader(body))
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
@@ -137,57 +245,30 @@ func PutCase(o GoDataCase, caseID string, opts Options) error {
 	return nil
 }
 
-// GetCaseByVisualId retrieves a case from GoData that matches the visualId.
-// An error is returned if the http request fails or if no case is found.
-func GetCaseByVisualId(visualId string, opts Options) (CaseID, error) {
-	token := opts.Token
-	// We need the id, so we should query for it.
-	filter := fmt.Sprintf("{\"where\":{\"visualId\": \"%s\"}}", visualId)
-	getUrl := fmt.Sprintf("%s?filter=%s", opts.Url, url.QueryEscape(filter))
-	getReq, _ := http.NewRequest(http.MethodGet, getUrl, nil)
-	getReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	getReq.Header.Set("Content-Type", "application/json")
-	getClient := &http.Client{}
-	getResp, err := getClient.Do(getReq)
-	if err != nil {
-		return CaseID{}, fmt.Errorf("could not retrieve case with visualId: %s | %w", visualId, err)
-	}
-	defer getResp.Body.Close()
-	var resps []CaseID
-	if err := json.NewDecoder(getResp.Body).Decode(&resps); err != nil {
-		log.WithFields(log.Fields{
-			"body":   getResp.Body,
-			"status": getResp.Status,
-		}).WithError(err).Info("godata case raw body")
-		if getResp.StatusCode == http.StatusOK {
-			return CaseID{}, nil
-		}
-		return CaseID{}, fmt.Errorf("failed to decode case data: status %d | godataApiUrl: %s : %w", getResp.StatusCode, getUrl, err)
-	}
-	if len(resps) == 0 {
-		return CaseID{}, fmt.Errorf("no record found with visualId: %s | error: %v", visualId, err)
-	}
-	return resps[0], nil
-}
-
-func eventToGoDataAddress(bzAddress models.AddressInBelize, phoneNumber string, date time.Time) GoDataAddress {
+func eventToGoDataAddress(bzAddress models.AddressInBelize, personalInfo models.PersonalInfo, date time.Time) GoDataAddress {
 	usualPlaceOfResidence := "LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE"
 	//accommodationResidence := "LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_ACCOMMODATION_NAME"
+
+	addressLine1 := bzAddress.Address.Address
+	if len(bzAddress.AccommodationName) > 0 {
+		addressLine1 = bzAddress.AccommodationName
+	}
 
 	address := GoDataAddress{
 		TypeId:       usualPlaceOfResidence,
 		Country:      "Belize",
 		City:         bzAddress.Address.Community.Municipality,
-		AddressLine1: bzAddress.Address.Address,
-		AddressLine2: bzAddress.AccommodationName,
+		AddressLine1: addressLine1,
+		AddressLine2: bzAddress.Address.Address,
 		Date:         date.Format("2006-01-02"),
-		PhoneNumber:  phoneNumber,
+		PhoneNumber:  personalInfo.PhoneNumbers,
 		LocationId:   bzAddress.Address.Community.ID,
+		Email:        personalInfo.Email,
 	}
 	return address
 }
 
-func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.ArrivalInfo, caseType, purposeOfTrip string) GoDataQuestionnaire {
+func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.ArrivalInfo, caseType string) GoDataQuestionnaire {
 	var fever = "No"
 	if screening.FluLikeSymptoms.Fever {
 		fever = yes
@@ -269,7 +350,7 @@ func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.Ar
 		abdominalPain = yes
 	}
 	var typeOfTraveller = "Non-Tourist"
-	if strings.ToLower(purposeOfTrip) == "tourist" {
+	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
 		typeOfTraveller = "Tourist"
 	}
 
@@ -353,10 +434,12 @@ func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.Ar
 		PriorXdayExposureTravelledInternationally: []QuestionnaireAnswer{
 			{Value: yes},
 		},
-		PriorXdayExposureContactWithCase:             nil,
-		PriorXDayexposureContactWithCaseDate:         nil,
-		PriorXdayExposureInternationalDateTravelFrom: nil,
-		PriorXdayExposureInternationalDatetravelTo:   nil,
+		PriorXdayExposureContactWithCase:     nil,
+		PriorXDayexposureContactWithCaseDate: nil,
+		PriorXdayExposureInternationalDateTravelFrom: []PriorXdayExposureInternationalDateTravelFrom{
+			{Value: arrivalInfo.DateOfEmbarkation},
+		},
+		PriorXdayExposureInternationalDatetravelTo: nil,
 		PriorXdayexposureInternationaltravelcountries: []PriorXdayExposureInternationalTravelCountries{
 			{Value: arrivalInfo.CountriesVisited},
 		},
@@ -364,7 +447,7 @@ func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.Ar
 			{Value: typeOfTraveller},
 		},
 		PurposeOfTravel: []QuestionnaireAnswer{
-			{Value: purposeOfTrip},
+			{Value: arrivalInfo.PurposeOfTrip},
 		},
 		FlightNumber: []QuestionnaireAnswer{
 			{Value: arrivalInfo.VesselNumber},
@@ -380,11 +463,15 @@ func createGoDataQuestionnaire(screening models.Screening, arrivalInfo models.Ar
 }
 
 func createGoDataCase(goDataQuestionnaire GoDataQuestionnaire, addresses []GoDataAddress, personalInfo models.PersonalInfo, visualId string) GoDataCase {
+	gender := "LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE"
+	if personalInfo.Gender == "Female" {
+		gender = "LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE"
+	}
 	return GoDataCase{
 		FirstName:                    personalInfo.FirstName,
 		MiddleName:                   personalInfo.MiddleName,
 		LastName:                     personalInfo.LastName,
-		Gender:                       personalInfo.Gender,
+		Gender:                       gender,
 		Classification:               "LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_SUSPECT",
 		Dob:                          personalInfo.Dob,
 		Occupation:                   personalInfo.Occupation,
@@ -409,13 +496,13 @@ func UpdateGoDataCase(args GodataCaseArg, caseId string, opts Options) error {
 	personalInfo := args.PersonalInfo
 	arrivalInfo := args.ArrivalInfo
 	visualID := args.VisualId
-	address := eventToGoDataAddress(args.Address, personalInfo.PhoneNumbers, arrivalInfo.DateOfArrival)
+	address := eventToGoDataAddress(args.Address, personalInfo, arrivalInfo.DateOfArrival)
 	var caseType = "Non-Tourist"
 	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
 		caseType = "Tourist"
 	}
 
-	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType, arrivalInfo.PurposeOfTrip)
+	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType)
 	godataCase := createGoDataCase(goDataQuestionnaire, []GoDataAddress{address}, personalInfo, visualID)
 	log.WithFields(log.Fields{
 		"godataCase": godataCase,
@@ -430,12 +517,12 @@ func PushToGoData(args GodataCaseArg, opts Options) error {
 	personalInfo := args.PersonalInfo
 	arrivalInfo := args.ArrivalInfo
 	visualId := args.VisualId
-	address := eventToGoDataAddress(args.Address, personalInfo.PhoneNumbers, arrivalInfo.DateOfArrival)
+	address := eventToGoDataAddress(args.Address, personalInfo, arrivalInfo.DateOfArrival)
 	var caseType = "Non-Tourist"
 	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
 		caseType = "Tourist"
 	}
-	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType, arrivalInfo.PurposeOfTrip)
+	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType)
 	godataCase := createGoDataCase(goDataQuestionnaire, []GoDataAddress{address}, personalInfo, visualId)
 	log.WithFields(log.Fields{
 		"godataCase": godataCase,
