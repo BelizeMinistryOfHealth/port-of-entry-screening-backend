@@ -50,8 +50,8 @@ func ScreeningEventHandler(
 	}
 	ID := fmt.Sprintf("%s#%s", hyphenateString(arrivalInfo.PortOfEntry), personalInfo.ID)
 	httpClient := http.Client{}
-	goAPi := godata.NewApi(godataURL, &httpClient)
-	caseID, err := goAPi.GetCaseByVisualId(ID, godata.Options{
+	goAPI := godata.NewAPI(godataURL, &httpClient)
+	caseID, err := goAPI.GetCaseByVisualId(ID, godata.Options{
 		URL:   godataURL,
 		Token: godataToken,
 	})
@@ -61,16 +61,16 @@ func ScreeningEventHandler(
 		"CaseID": caseID,
 	}).Info("Retrieved godata case")
 
-	arg := godata.GodataCaseArg{
+	arg := godata.CaseArg{
 		PersonalInfo: personalInfo,
 		Screening:    screening,
 		ArrivalInfo:  arrivalInfo,
 		Address:      address,
-		VisualId:     ID,
+		VisualID:     ID,
 	}
 	if err != nil || len(caseID.ID) > 0 {
 		// PUT
-		if err := godata.UpdateGoDataCase(arg, caseID.ID, godata.Options{
+		if err := goAPI.UpdateCase(arg, caseID.ID, godata.Options{
 			URL:        godataURL,
 			Token:      godataToken,
 			OutbreakID: outbreakID,
@@ -84,7 +84,7 @@ func ScreeningEventHandler(
 		}
 	}
 
-	if err := godata.PushToGoData(arg,
+	if err := goAPI.CreateCase(arg,
 		godata.Options{URL: godataURL, Token: godataToken, OutbreakID: outbreakID}); err != nil {
 		log.WithFields(log.Fields{
 			"screening":    screening,
@@ -93,7 +93,6 @@ func ScreeningEventHandler(
 		}).WithError(err).Error("failed to update godata case")
 		return fmt.Errorf("error creating new GoData case: %w", err)
 	}
-	// Check if POST or PUT
-	// Do upload
+
 	return nil
 }

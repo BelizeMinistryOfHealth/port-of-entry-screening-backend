@@ -15,6 +15,15 @@ import (
 
 const yes = "Yes"
 
+// CaseArg are the arguments for creating a new GoData Case
+type CaseArg struct {
+	PersonalInfo models.PersonalInfo
+	Screening    models.Screening
+	ArrivalInfo  models.ArrivalInfo
+	Address      models.AddressInBelize
+	VisualID     string
+}
+
 // Options for making GoData requests
 type Options struct {
 	Username   string
@@ -36,6 +45,8 @@ type goDataAuthResponse struct {
 // API is the GoData api
 type API interface {
 	GetCaseByVisualId(visualID string, opts Options) (CaseID, error)
+	UpdateCase(args CaseArg, caseId string, opts Options) error
+	CreateCase(args CaseArg, opts Options) error
 }
 
 type api struct {
@@ -43,8 +54,8 @@ type api struct {
 	baseURL string
 }
 
-// NewApi creates a new GoData API
-func NewApi(baseURL string, httpClient *http.Client) API {
+// NewAPI creates a new GoData API
+func NewAPI(baseURL string, httpClient *http.Client) API {
 	return &api{
 		Client:  httpClient,
 		baseURL: baseURL,
@@ -91,6 +102,7 @@ func (e *HTTPRequestErr) Error() string {
 	return e.Msg
 }
 
+// Unwrap unwraps the HTTP error
 func (e *HTTPRequestErr) Unwrap() error {
 	return e.Err
 }
@@ -141,14 +153,49 @@ func (a *api) GetCaseByVisualId(visualId string, opts Options) (CaseID, error) {
 	return resps[0], nil
 }
 
+func newCase(args CaseArg) GoDataCase {
+	screening := args.Screening
+	personalInfo := args.PersonalInfo
+	arrivalInfo := args.ArrivalInfo
+	visualID := args.VisualID
+	address := eventToGoDataAddress(args.Address, personalInfo, arrivalInfo.DateOfArrival)
+	var caseType = "Non-Tourist"
+	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
+		caseType = "Tourist"
+	}
+
+	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType)
+	return createGoDataCase(goDataQuestionnaire, []GoDataAddress{address}, personalInfo, visualID)
+}
+
+// UpdateCase makes a put request to GoData to update an existing case.
+func (a *api) UpdateCase(args CaseArg, caseId string, opts Options) error {
+	godataCase := newCase(args)
+	log.WithFields(log.Fields{
+		"godataCase": godataCase,
+	}).Info("putting to godata")
+
+	return a.putCase(godataCase, caseId, opts.Token)
+}
+
+// CreateCase creates a new godata case by making an http post request
+func (a *api) CreateCase(args CaseArg, opts Options) error {
+	godataCase := newCase(args)
+	log.WithFields(log.Fields{
+		"godataCase": godataCase,
+	}).Info("Posting to godata")
+
+	return postCase(godataCase, opts) // push visitor log struct to
+}
+
 // GetGodataToken retrieves a JWT token from a GoData Server.
-func GetGodataToken(username, password, baseUrl string) (string, error) {
+func GetGodataToken(username, password, baseURL string) (string, error) {
 	reqBody, err := json.Marshal(map[string]string{"username": username, "password": password})
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("Error authenticating with GoData")
 		return "", err
 	}
-	req, err := http.Post(fmt.Sprintf("%s/oauth/token", baseUrl), "application/json", bytes.NewBuffer(reqBody))
+	req, err := http.Post(fmt.Sprintf("%s/oauth/token", baseURL), "application/json", bytes.NewBuffer(reqBody))
 
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("Error retrieving token from GoData")
@@ -187,8 +234,8 @@ func postToGodata(godataCase GoDataCase, opts Options) (*http.Response, error) {
 	return client.Do(newReq)
 }
 
-// PostCase creates a new case in a GoData server.
-func PostCase(o GoDataCase, opts Options) error {
+// postCase creates a new case in a GoData server.
+func postCase(o GoDataCase, opts Options) error {
 	resp, err := postToGodata(o, opts)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("failed to post new case to godata")
@@ -221,21 +268,19 @@ func PostCase(o GoDataCase, opts Options) error {
 	return nil
 }
 
-// PutCase updates a case in GoData.
-func PutCase(o GoDataCase, caseID string, opts Options) error {
-	token := opts.Token
+// putCase updates a case in GoData.
+func (a *api) putCase(o GoDataCase, caseID, token string) error {
 	body, err := json.Marshal(o)
 	if err != nil {
 		return fmt.Errorf("failed to marshal godata case: %w", err)
 	}
 
-	req, _ := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/%s", opts.URL, caseID), bytes.NewReader(body))
+	req, _ := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/%s", a.baseURL, caseID), bytes.NewReader(body))
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := a.Client.Do(req)
 	if err != nil {
-		return fmt.Errorf("PutCase() to GoData failed: %w", err)
+		return fmt.Errorf("putCase() to GoData failed: %w", err)
 	}
 	defer resp.Body.Close()
 	log.WithFields(log.Fields{
@@ -481,53 +526,4 @@ func createGoDataCase(goDataQuestionnaire GoDataQuestionnaire, addresses []GoDat
 		Questionnaire:                goDataQuestionnaire,
 		VisualId:                     visualId,
 	}
-}
-
-type GodataCaseArg struct {
-	PersonalInfo models.PersonalInfo
-	Screening    models.Screening
-	ArrivalInfo  models.ArrivalInfo
-	Address      models.AddressInBelize
-	VisualId     string
-}
-
-func UpdateGoDataCase(args GodataCaseArg, caseId string, opts Options) error {
-	screening := args.Screening
-	personalInfo := args.PersonalInfo
-	arrivalInfo := args.ArrivalInfo
-	visualID := args.VisualId
-	address := eventToGoDataAddress(args.Address, personalInfo, arrivalInfo.DateOfArrival)
-	var caseType = "Non-Tourist"
-	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
-		caseType = "Tourist"
-	}
-
-	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType)
-	godataCase := createGoDataCase(goDataQuestionnaire, []GoDataAddress{address}, personalInfo, visualID)
-	log.WithFields(log.Fields{
-		"godataCase": godataCase,
-		"addresses":  address,
-	}).Info("putting to godata")
-
-	return PutCase(godataCase, caseId, opts)
-}
-
-func PushToGoData(args GodataCaseArg, opts Options) error {
-	screening := args.Screening
-	personalInfo := args.PersonalInfo
-	arrivalInfo := args.ArrivalInfo
-	visualId := args.VisualId
-	address := eventToGoDataAddress(args.Address, personalInfo, arrivalInfo.DateOfArrival)
-	var caseType = "Non-Tourist"
-	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
-		caseType = "Tourist"
-	}
-	goDataQuestionnaire := createGoDataQuestionnaire(screening, arrivalInfo, caseType)
-	godataCase := createGoDataCase(goDataQuestionnaire, []GoDataAddress{address}, personalInfo, visualId)
-	log.WithFields(log.Fields{
-		"godataCase": godataCase,
-		"addresses":  address,
-	}).Info("Posting to godata")
-
-	return PostCase(godataCase, opts) // push visitor log struct to
 }

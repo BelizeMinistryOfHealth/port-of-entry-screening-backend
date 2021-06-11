@@ -241,7 +241,7 @@ func TestAPI_GetCaseByVisualId(t *testing.T) {
 		OutbreakID: "5fc2d66b-8af8-42eb-a47a-c56fdd42264a",
 	}
 
-	api := NewApi(opts.URL, server.Client())
+	api := NewAPI(opts.URL, server.Client())
 
 	caseID, err := api.GetCaseByVisualId(visualID, opts)
 	require.NoError(t, err)
@@ -263,7 +263,7 @@ func TestApi_GetCaseByVisualId_NoResults(t *testing.T) {
 		Token:      "zDU31XGBhGxXfgdz4TUc0xgKBwjKo5otBwG79Db5D7GUqWrwBH1V49K3qyvOJggZ",
 		OutbreakID: "5fc2d66b-8af8-42eb-a47a-c56fdd42264a",
 	}
-	api := NewApi(opts.URL, server.Client())
+	api := NewAPI(opts.URL, server.Client())
 
 	caseID, err := api.GetCaseByVisualId(visualID, opts)
 	var noResultsErr *NoResultsErr
