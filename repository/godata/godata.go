@@ -112,7 +112,7 @@ func (e *HTTPRequestErr) Unwrap() error {
 func (a *api) GetCaseByVisualId(visualID string, opts Options) (CaseID, error) {
 	token := opts.Token
 	// We need the id, so we should query for it.
-	filter := fmt.Sprintf("{\"where\":{\"visualID\":{\"regexp\":\"/^%s/i\"}}}", visualID)
+	filter := fmt.Sprintf("{\"where\":{\"visualId\":{\"regexp\":\"/^%s/i\"}}}", visualID)
 	getURL := fmt.Sprintf("%s/outbreaks/%s/cases?filter=%s&access_token=%s", a.baseURL, opts.OutbreakID, url.QueryEscape(filter), opts.Token)
 	getReq, _ := http.NewRequest(http.MethodGet, getURL, nil)
 	getReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
