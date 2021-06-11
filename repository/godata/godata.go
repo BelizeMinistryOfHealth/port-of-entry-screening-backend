@@ -169,13 +169,13 @@ func newCase(args CaseArg) GoDataCase {
 }
 
 // UpdateCase makes a put request to GoData to update an existing case.
-func (a *api) UpdateCase(args CaseArg, caseId string, opts Options) error {
+func (a *api) UpdateCase(args CaseArg, caseID string, opts Options) error {
 	godataCase := newCase(args)
 	log.WithFields(log.Fields{
 		"godataCase": godataCase,
 	}).Info("putting to godata")
 
-	return a.putCase(godataCase, caseId, opts.Token)
+	return a.putCase(godataCase, caseID, opts.Token)
 }
 
 // CreateCase creates a new godata case by making an http post request
@@ -193,19 +193,22 @@ func GetGodataToken(username, password, baseURL string) (string, error) {
 	reqBody, err := json.Marshal(map[string]string{"username": username, "password": password})
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("Error authenticating with GoData")
-		return "", err
+		return "", fmt.Errorf("marshalling request for godata token failed: %w", err)
 	}
-	req, err := http.Post(fmt.Sprintf("%s/oauth/token", baseURL), "application/json", bytes.NewBuffer(reqBody))
+	req, err := http.Post(fmt.Sprintf("%s/oauth/token", baseURL),
+		"application/json", bytes.NewBuffer(reqBody))
 
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("Error retrieving token from GoData")
-		return "", err
+		return "", fmt.Errorf("failed to retrieve token from GoData: %w", err)
 	}
+
+	defer req.Body.Close() //nolint:errcheck
 
 	var authResp *goDataAuthResponse
 	if err := json.NewDecoder(req.Body).Decode(&authResp); err != nil {
 		log.WithFields(log.Fields{"error": err, "response": req}).Error("failed to decode oauth token from godata")
-		return "", err
+		return "", fmt.Errorf("failed to decode token response: %w", err)
 	}
 	return authResp.AccessToken, nil
 }
@@ -213,25 +216,25 @@ func GetGodataToken(username, password, baseURL string) (string, error) {
 func postToGodata(godataCase GoDataCase, opts Options) (*http.Response, error) {
 
 	token := opts.Token
-	outbreakId := opts.OutbreakID
+	outbreakID := opts.OutbreakID
 
 	// Prepare post request to create case
 	body, err := json.Marshal(godataCase)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err, "data": godataCase}).Error("failed to marshal go data case")
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal godata case: %w", err)
 	}
 
 	client := &http.Client{}
-	newReq, _ := http.NewRequest("POST", fmt.Sprintf("%s/outbreaks/%s/cases", opts.URL, outbreakId), bytes.NewReader(body))
+	newReq, _ := http.NewRequest("POST", fmt.Sprintf("%s/outbreaks/%s/cases", opts.URL, outbreakID), bytes.NewReader(body))
 	newReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	newReq.Header.Set("Content-Type", "application/json")
 	log.WithFields(log.Fields{
 		"body": body,
 		"case": godataCase,
 	}).Info("Sending new request to GoData")
-	defer newReq.Body.Close()
-	return client.Do(newReq)
+	defer newReq.Body.Close() //nolint:errcheck
+	return client.Do(newReq)  //nolint:wrapcheck
 }
 
 // postCase creates a new case in a GoData server.
@@ -239,16 +242,16 @@ func postCase(o GoDataCase, opts Options) error {
 	resp, err := postToGodata(o, opts)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("failed to post new case to godata")
-		return fmt.Errorf("failed to post new case to godata: %+v", err)
+		return fmt.Errorf("failed to post new case to godata: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"respBody": string(respBody),
 		}).WithError(err).Error("Error reading response from godata")
-		return fmt.Errorf("error reading godata response: %v  error: %v", respBody, err)
+		return fmt.Errorf("error reading godata response: %v  error: %w", respBody, err)
 	}
 	log.WithFields(log.Fields{
 		"case":     o,
@@ -257,7 +260,7 @@ func postCase(o GoDataCase, opts Options) error {
 
 	if resp.StatusCode != 200 {
 		log.WithFields(log.Fields{"responseFromGoData": respBody}).Error("error posting case to godata")
-		return fmt.Errorf("error posting case to godata")
+		return fmt.Errorf("error posting case to godata") //nolint:goerr113
 	}
 
 	log.WithFields(
@@ -282,7 +285,7 @@ func (a *api) putCase(o GoDataCase, caseID, token string) error {
 	if err != nil {
 		return fmt.Errorf("putCase() to GoData failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 	log.WithFields(log.Fields{
 		"case":   o,
 		"caseID": caseID,
