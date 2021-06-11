@@ -44,7 +44,7 @@ type goDataAuthResponse struct {
 
 // API is the GoData api
 type API interface {
-	GetCaseByVisualId(visualID string, opts Options) (CaseID, error)
+	GetCaseByVisualID(visualID string, opts Options) (CaseID, error)
 	UpdateCase(args CaseArg, caseID string, opts Options) error
 	CreateCase(args CaseArg, opts Options) error
 }
@@ -107,9 +107,9 @@ func (e *HTTPRequestErr) Unwrap() error {
 	return e.Err
 }
 
-// GetCaseByVisualId retrieves a case from GoData that matches the visualId.
+// GetCaseByVisualID retrieves a case from GoData that matches the visualId.
 // An error is returned if the http request fails or if no case is found.
-func (a *api) GetCaseByVisualId(visualID string, opts Options) (CaseID, error) {
+func (a *api) GetCaseByVisualID(visualID string, opts Options) (CaseID, error) {
 	token := opts.Token
 	// We need the id, so we should query for it.
 	filter := fmt.Sprintf("{\"where\":{\"visualId\":{\"regexp\":\"/^%s/i\"}}}", visualID)
@@ -153,7 +153,7 @@ func (a *api) GetCaseByVisualId(visualID string, opts Options) (CaseID, error) {
 	return resps[0], nil
 }
 
-func newCase(args CaseArg) GoDataCase {
+func newCase(args CaseArg) Case {
 	screening := args.Screening
 	personalInfo := args.PersonalInfo
 	arrivalInfo := args.ArrivalInfo
@@ -165,7 +165,7 @@ func newCase(args CaseArg) GoDataCase {
 	}
 
 	goDataQuestionnaire := createGoDataQuestionnaire(personalInfo, screening, arrivalInfo, caseType)
-	return createGoDataCase(goDataQuestionnaire, []GoDataAddress{address}, personalInfo, visualID)
+	return createGoDataCase(goDataQuestionnaire, []Address{address}, personalInfo, visualID)
 }
 
 // UpdateCase makes a put request to GoData to update an existing case.
@@ -213,7 +213,7 @@ func GetGodataToken(username, password, baseURL string) (string, error) {
 	return authResp.AccessToken, nil
 }
 
-func postToGodata(godataCase GoDataCase, opts Options) (*http.Response, error) {
+func postToGodata(godataCase Case, opts Options) (*http.Response, error) {
 
 	token := opts.Token
 	outbreakID := opts.OutbreakID
@@ -238,7 +238,7 @@ func postToGodata(godataCase GoDataCase, opts Options) (*http.Response, error) {
 }
 
 // postCase creates a new case in a GoData server.
-func postCase(o GoDataCase, opts Options) error {
+func postCase(o Case, opts Options) error {
 	resp, err := postToGodata(o, opts)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("failed to post new case to godata")
@@ -272,7 +272,7 @@ func postCase(o GoDataCase, opts Options) error {
 }
 
 // putCase updates a case in GoData.
-func (a *api) putCase(o GoDataCase, caseID, token string) error {
+func (a *api) putCase(o Case, caseID, token string) error {
 	body, err := json.Marshal(o)
 	if err != nil {
 		return fmt.Errorf("failed to marshal godata case: %w", err)
@@ -293,7 +293,7 @@ func (a *api) putCase(o GoDataCase, caseID, token string) error {
 	return nil
 }
 
-func eventToGoDataAddress(bzAddress models.AddressInBelize, personalInfo models.PersonalInfo, date time.Time) GoDataAddress {
+func eventToGoDataAddress(bzAddress models.AddressInBelize, personalInfo models.PersonalInfo, date time.Time) Address {
 	usualPlaceOfResidence := "LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE"
 	//accommodationResidence := "LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_ACCOMMODATION_NAME"
 
@@ -302,21 +302,21 @@ func eventToGoDataAddress(bzAddress models.AddressInBelize, personalInfo models.
 		addressLine1 = bzAddress.AccommodationName
 	}
 
-	address := GoDataAddress{
-		TypeId:       usualPlaceOfResidence,
+	address := Address{
+		TypeID:       usualPlaceOfResidence,
 		Country:      "Belize",
 		City:         bzAddress.Address.Community.Municipality,
 		AddressLine1: addressLine1,
 		AddressLine2: bzAddress.Address.Address,
 		Date:         date.Format("2006-01-02"),
 		PhoneNumber:  personalInfo.PhoneNumbers,
-		LocationId:   bzAddress.Address.Community.ID,
+		LocationID:   bzAddress.Address.Community.ID,
 		Email:        personalInfo.Email,
 	}
 	return address
 }
 
-func createGoDataQuestionnaire(personalInfo models.PersonalInfo, screening models.Screening, arrivalInfo models.ArrivalInfo, caseType string) GoDataQuestionnaire {
+func createGoDataQuestionnaire(personalInfo models.PersonalInfo, screening models.Screening, arrivalInfo models.ArrivalInfo, caseType string) Questionnaire {
 	var fever = "No"
 	if screening.FluLikeSymptoms.Fever {
 		fever = yes
@@ -406,76 +406,76 @@ func createGoDataQuestionnaire(personalInfo models.PersonalInfo, screening model
 	if screening.TookPcrTestInPast72Hours {
 		pcrTest = yes
 	}
-	godataQuestionnaire := GoDataQuestionnaire{
-		CaseForm: []GoDataCaseForm{
+	godataQuestionnaire := Questionnaire{
+		CaseForm: []CaseForm{
 			{Value: []string{
 				"Form A0: Minimum data reporting form – for suspected and probable cases",
 				"Form A2: Case follow-up form – for confirmed cases (Day 14-21)"},
 			},
 		},
-		DataCollectorName: []DataCollectorName{{Value: screening.CreatedBy.Email}},
+		DataCollectorName: []QuestionnaireAnswer{{Value: screening.CreatedBy.Email}},
 		CountryResidence:  nil,
-		ShowsSymptoms:     []ShowsSymptoms{{Value: "Unknown"}},
-		Fever: []SymptomFever{
+		ShowsSymptoms:     []QuestionnaireAnswer{{Value: "Unknown"}},
+		Fever: []QuestionnaireAnswer{
 			{Value: fever},
 		},
-		SoreThroat: []SoreThroat{
+		SoreThroat: []QuestionnaireAnswer{
 			{Value: soreThroat},
 		},
-		RunnyNose: []RunnyNose{
+		RunnyNose: []QuestionnaireAnswer{
 			{Value: runnyNose},
 		},
-		Cough: []Cough{
+		Cough: []QuestionnaireAnswer{
 			{
 				Value: cough,
 			},
 		},
-		Vomiting: []Vomiting{
+		Vomiting: []QuestionnaireAnswer{
 			{Value: vomiting},
 		},
-		Nausea: []Nausea{
+		Nausea: []QuestionnaireAnswer{
 			{Value: nausea},
 		},
-		Malaise: []Malaise{
+		Malaise: []QuestionnaireAnswer{
 			{Value: malaise},
 		},
-		Diarrhea: []Diarrhea{
+		Diarrhea: []QuestionnaireAnswer{
 			{Value: diarrhea},
 		},
-		ShortnessOfBreath: []ShortnessOfBreath{
+		ShortnessOfBreath: []QuestionnaireAnswer{
 			{Value: shortnessOfBreath},
 		},
-		DifficultyBreathing: []DifficultyBreathing{
+		DifficultyBreathing: []QuestionnaireAnswer{
 			{Value: difficultyBreathing},
 		},
-		SymptomsChills: []SymptomsChills{
+		SymptomsChills: []QuestionnaireAnswer{
 			{Value: chills},
 		},
-		Headache: []Headache{
+		Headache: []QuestionnaireAnswer{
 			{Value: headache},
 		},
-		Anosmia: []Anosmia{
+		Anosmia: []QuestionnaireAnswer{
 			{Value: anosmia},
 		},
-		Aguesia: []Aguesia{
+		Aguesia: []QuestionnaireAnswer{
 			{Value: aguesia},
 		},
-		Bleeding: []Bleeding{
+		Bleeding: []QuestionnaireAnswer{
 			{Value: bleeding},
 		},
-		JointMusclePain: []JointMusclePain{
+		JointMusclePain: []QuestionnaireAnswer{
 			{Value: jointMusclePain},
 		},
-		EyeFacialPain: []EyeFacialPain{
+		EyeFacialPain: []QuestionnaireAnswer{
 			{Value: eyeFacialPain},
 		},
-		GeneralizedRash: []GeneralizedRash{
+		GeneralizedRash: []QuestionnaireAnswer{
 			{Value: generalizedRash},
 		},
-		BlurredVision: []BlurredVision{
+		BlurredVision: []QuestionnaireAnswer{
 			{Value: blurredVision},
 		},
-		AbdominalPain: []AbdominalPain{
+		AbdominalPain: []QuestionnaireAnswer{
 			{Value: abdominalPain},
 		},
 		CaseType: caseType,
@@ -484,11 +484,11 @@ func createGoDataQuestionnaire(personalInfo models.PersonalInfo, screening model
 		},
 		PriorXdayExposureContactWithCase:     nil,
 		PriorXDayexposureContactWithCaseDate: nil,
-		PriorXdayExposureInternationalDateTravelFrom: []PriorXdayExposureInternationalDateTravelFrom{
+		PriorXdayExposureInternationalDateTravelFrom: []QuestionnaireTimeAnswer{
 			{Value: arrivalInfo.DateOfEmbarkation},
 		},
 		PriorXdayExposureInternationalDatetravelTo: nil,
-		PriorXdayexposureInternationaltravelcountries: []PriorXdayExposureInternationalTravelCountries{
+		PriorXdayexposureInternationaltravelcountries: []QuestionnaireAnswer{
 			{Value: arrivalInfo.CountriesVisited},
 		},
 		TypeOfTraveller: []QuestionnaireAnswer{
@@ -511,12 +511,12 @@ func createGoDataQuestionnaire(personalInfo models.PersonalInfo, screening model
 	return godataQuestionnaire
 }
 
-func createGoDataCase(goDataQuestionnaire GoDataQuestionnaire, addresses []GoDataAddress, personalInfo models.PersonalInfo, visualId string) GoDataCase {
+func createGoDataCase(goDataQuestionnaire Questionnaire, addresses []Address, personalInfo models.PersonalInfo, visualID string) Case {
 	gender := "LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE"
 	if personalInfo.Gender == "Female" {
 		gender = "LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE"
 	}
-	return GoDataCase{
+	return Case{
 		FirstName:                    personalInfo.FirstName,
 		MiddleName:                   personalInfo.MiddleName,
 		LastName:                     personalInfo.LastName,
@@ -528,6 +528,6 @@ func createGoDataCase(goDataQuestionnaire GoDataQuestionnaire, addresses []GoDat
 		IsDateOfReportingApproximate: false,
 		Addresses:                    addresses,
 		Questionnaire:                goDataQuestionnaire,
-		VisualId:                     visualId,
+		VisualID:                     visualID,
 	}
 }

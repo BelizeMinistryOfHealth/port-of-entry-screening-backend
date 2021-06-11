@@ -51,7 +51,7 @@ func ScreeningEventHandler(
 	ID := fmt.Sprintf("%s#%s", hyphenateString(arrivalInfo.PortOfEntry), personalInfo.ID)
 	httpClient := http.Client{}
 	goAPI := godata.NewAPI(godataURL, &httpClient)
-	caseID, err := goAPI.GetCaseByVisualId(ID, godata.Options{
+	caseID, err := goAPI.GetCaseByVisualID(ID, godata.Options{
 		URL:   godataURL,
 		Token: godataToken,
 	})

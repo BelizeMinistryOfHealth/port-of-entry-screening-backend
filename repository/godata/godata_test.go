@@ -243,7 +243,7 @@ func TestAPI_GetCaseByVisualId(t *testing.T) {
 
 	api := NewAPI(opts.URL, server.Client())
 
-	caseID, err := api.GetCaseByVisualId(visualID, opts)
+	caseID, err := api.GetCaseByVisualID(visualID, opts)
 	require.NoError(t, err)
 
 	assert.Equal(t, "83d63d59-e682-4c3f-8279-e525ff1fe6c4", caseID.ID)
@@ -251,7 +251,7 @@ func TestAPI_GetCaseByVisualId(t *testing.T) {
 
 func TestApi_GetCaseByVisualId_NoResults(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		rw.Write([]byte("[]"))
+		rw.Write([]byte("[]")) //nolint:gosec,errcheck
 	}))
 
 	defer server.Close()
@@ -265,7 +265,7 @@ func TestApi_GetCaseByVisualId_NoResults(t *testing.T) {
 	}
 	api := NewAPI(opts.URL, server.Client())
 
-	caseID, err := api.GetCaseByVisualId(visualID, opts)
+	caseID, err := api.GetCaseByVisualID(visualID, opts)
 	var noResultsErr *NoResultsErr
 	assert.ErrorAs(t, err, &noResultsErr)
 	assert.Equal(t, "", caseID.ID)
