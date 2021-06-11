@@ -53,6 +53,7 @@ type FirestoreAddresses struct {
 	} `json:"arrayValue"`
 }
 
+// FluLikeSymptomsEvent represents the flu symptoms in a firestore event
 type FluLikeSymptomsEvent struct {
 	MapValue struct {
 		Fields struct {

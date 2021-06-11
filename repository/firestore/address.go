@@ -42,16 +42,18 @@ func (p *AddressStoreService) GetByID(ctx context.Context, ID string) (models.Ad
 	return address, nil
 }
 
-func (s *AddressStoreService) CreateAddress(ctx context.Context, address models.AddressInBelize) error {
-	_, err := s.colRef.Doc(address.ID).Set(ctx, address)
+// CreateAddress persists an address
+func (p *AddressStoreService) CreateAddress(ctx context.Context, address models.AddressInBelize) error {
+	_, err := p.colRef.Doc(address.ID).Set(ctx, address)
 	if err != nil {
 		return fmt.Errorf("AddressStoreService.CreateAddress: failed: %w", err)
 	}
 	return nil
 }
 
-func (s *AddressStoreService) DeleteAddress(ctx context.Context, ID string) error {
-	_, err := s.colRef.Doc(ID).Delete(ctx)
+// DeleteAddress deletes an address from Firestore
+func (p *AddressStoreService) DeleteAddress(ctx context.Context, ID string) error {
+	_, err := p.colRef.Doc(ID).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("DeleteAddress failed: %w", err)
 	}

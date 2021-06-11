@@ -40,16 +40,18 @@ func (p *ArrivalsStoreService) GetByID(ctx context.Context, ID string) (models.A
 	return arrival, nil
 }
 
-func (s *ArrivalsStoreService) CreateArrival(ctx context.Context, arrival models.ArrivalInfo) error {
-	_, err := s.colRef.Doc(arrival.ID).Set(ctx, arrival)
+// CreateArrival persists an arrival in Firestore
+func (p *ArrivalsStoreService) CreateArrival(ctx context.Context, arrival models.ArrivalInfo) error {
+	_, err := p.colRef.Doc(arrival.ID).Set(ctx, arrival)
 	if err != nil {
 		return fmt.Errorf("ArrivalStoreService.CreateArrival: failed: %w", err)
 	}
 	return nil
 }
 
-func (s *ArrivalsStoreService) DeleteArrival(ctx context.Context, ID string) error {
-	_, err := s.colRef.Doc(ID).Delete(ctx)
+// DeleteArrival deletes an arrival from Firestore
+func (p *ArrivalsStoreService) DeleteArrival(ctx context.Context, ID string) error {
+	_, err := p.colRef.Doc(ID).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("DeleteArrival failed: %w", err)
 	}
