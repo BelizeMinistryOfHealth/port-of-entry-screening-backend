@@ -110,3 +110,21 @@ type Person struct {
 	Questionnaire                Questionnaire `json:"questionnaireAnswers"`
 	VisualID                     string        `json:"visualId"`
 }
+
+type VaccineStatus string
+type VaccineDose string
+
+const (
+	vaccinated    VaccineStatus = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS_VACCINATED"
+	notVaccinated VaccineStatus = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS_NOT_VACCINATED"
+	astraFirst    VaccineDose   = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_ASTRAZENECA_1ST_DOSE"
+	astraSecond   VaccineDose   = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_ASTRAZENECA_2ND_DOSE"
+)
+
+// Vaccination structure in Godata is an array:
+// vaccinesReceived: [{date, status (LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS_VACCINATED), vaccine (LNG_REFERENCE_DATA_CATEGORY_VACCINE_ASTRAZENECA_1ST_DOSE)}]
+type Vaccination struct {
+	Date    time.Time     `json:"date"`
+	Status  VaccineStatus `json:"status"`
+	Vaccine VaccineDose   `json:"vaccine"`
+}
