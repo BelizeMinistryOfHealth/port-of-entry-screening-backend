@@ -23,7 +23,8 @@ a few functions were changed:
 
 - cloudbuild.screening-updates.yaml deploys all cloud functions related to firestore triggers when the screening collection changes.
 - cloudbuild.persons.yaml deploys all functions related to the firestore triggers when the persons collection changes.
-- 
+- cloudbuild.registration.yaml deploys cloud functions for the registration app
+- cloudbuild.firesearch.yaml deploys cloud functions for firesearch utilities
 
 ### Deploying from the cli
 
@@ -33,7 +34,17 @@ gcloud builds submit --config=cloudbuild.persons.yaml --async --format=json
 ```
 
 
-Screnings Functions
+Screenings Functions
 ```
 gcloud builds submit --config=cloudbuild.screening-updates.yaml --async --format=json
+```
+
+Firesearch Functions
+```
+gcloud builds submit --config=cloudbuild.firesearch.yaml --async --format=json
+```
+
+Registration Functions
+```
+gcloud builds submit --config=cloudbuild.registration.yaml --async --format=json
 ```
