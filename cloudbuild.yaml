@@ -9,19 +9,19 @@ steps:
       - --keyring=${_KEYRING}
       - --key=${_KEY}
       - --verbosity=debug
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: "Screening Updates"
-    args:
-    - functions
-    - deploy
-    - 'ScreeningUpdatedListener'
-    - --trigger-event providers/cloud.firestore/eventTypes/document.update
-    - --trigger-resource "projects/epi-belize/databases/(default)/documents/screenings/{pushId}"
-    - --runtime=go113
-    - --entry-point=ScreeningListener
-    - --region=us-east1
-    - --env-vars-file=env.yaml
-    dir: .
+#  - name: 'gcr.io/cloud-builders/gcloud'
+#    id: "Screening Updates"
+#    args:
+#    - functions
+#    - deploy
+#    - 'ScreeningUpdatedListener'
+#    - --trigger-event providers/cloud.firestore/eventTypes/document.update
+#    - --trigger-resource "projects/epi-belize/databases/(default)/documents/screenings/{pushId}"
+#    - --runtime=go113
+#    - --entry-point=ScreeningListener
+#    - --region=us-east1
+#    - --env-vars-file=env.yaml
+#    dir: .
 #  - name: 'gcr.io/cloud-builders/gcloud'
 #    id: "Find By Port of Entry Fn"
 #    args:

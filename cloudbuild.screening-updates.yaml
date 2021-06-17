@@ -16,7 +16,7 @@ steps:
     - deploy
     - 'ScreeningUpdatedListener'
     - --trigger-event=providers/cloud.firestore/eventTypes/document.update
-    - --trigger-resource="projects/epi-belize/databases/(default)/documents/screenings/{pushId}"
+    - --trigger-resource=projects/epi-belize/databases/(default)/documents/screenings/{pushId}
     - --runtime=go113
     - --entry-point=ScreeningListener
     - --region=us-east1
