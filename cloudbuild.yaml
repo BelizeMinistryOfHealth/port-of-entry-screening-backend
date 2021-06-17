@@ -4,63 +4,63 @@ steps:
       - kms
       - decrypt
       - --ciphertext-file=env.production.yaml.enc
-      - --plaintext-file=./fns/env.yaml
+      - --plaintext-file=./env.yaml
       - --location=global
       - --keyring=${_KEYRING}
       - --key=${_KEY}
       - --verbosity=debug
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: "Arrivals Fn"
-    args: 
-    - functions
-    - deploy
-    - 'arrivals'
-    - --trigger-http
-    - --runtime=go113
-    - --entry-point=Arrivals
-    - --region=us-east1
-    - --env-vars-file=env.yaml
-    - --allow-unauthenticated
-    dir: ./fns
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: "Find By Port of Entry Fn"
-    args:
-      - functions
-      - deploy
-      - 'byPortOfEntry'
-      - --trigger-http
-      - --runtime=go113
-      - --entry-point=FindByPortOfEntry
-      - --region=us-east1
-      - --env-vars-file=env.yaml
-      - --allow-unauthenticated
-    dir: ./fns
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: "Find By Name"
-    args:
-      - functions
-      - deploy
-      - 'findByName'
-      - --trigger-http
-      - --runtime=go113
-      - --entry-point=FindByName
-      - --region=us-east1
-      - --env-vars-file=env.yaml
-      - --allow-unauthenticated
-    dir: ./fns
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: "Save Screening"
-    args:
-      - functions
-      - deploy
-      - 'screening'
-      - --trigger-http
-      - --runtime=go113
-      - --entry-point=AddScreening
-      - --region=us-east1
-      - --env-vars-file=env.yaml
-      - --allow-unauthenticated
-    dir: ./fns
+#  - name: 'gcr.io/cloud-builders/gcloud'
+#    id: "Screening Updates"
+#    args:
+#    - functions
+#    - deploy
+#    - 'ScreeningUpdatedListener'
+#    - --trigger-event providers/cloud.firestore/eventTypes/document.update
+#    - --trigger-resource "projects/epi-belize/databases/(default)/documents/screenings/{pushId}"
+#    - --runtime=go113
+#    - --entry-point=ScreeningListener
+#    - --region=us-east1
+#    - --env-vars-file=env.yaml
+#    dir: .
+#  - name: 'gcr.io/cloud-builders/gcloud'
+#    id: "Find By Port of Entry Fn"
+#    args:
+#      - functions
+#      - deploy
+#      - 'byPortOfEntry'
+#      - --trigger-http
+#      - --runtime=go113
+#      - --entry-point=FindByPortOfEntry
+#      - --region=us-east1
+#      - --env-vars-file=env.yaml
+#      - --allow-unauthenticated
+#    dir: ./fns
+#  - name: 'gcr.io/cloud-builders/gcloud'
+#    id: "Find By Name"
+#    args:
+#      - functions
+#      - deploy
+#      - 'findByName'
+#      - --trigger-http
+#      - --runtime=go113
+#      - --entry-point=FindByName
+#      - --region=us-east1
+#      - --env-vars-file=env.yaml
+#      - --allow-unauthenticated
+#    dir: ./fns
+#  - name: 'gcr.io/cloud-builders/gcloud'
+#    id: "Save Screening"
+#    args:
+#      - functions
+#      - deploy
+#      - 'screening'
+#      - --trigger-http
+#      - --runtime=go113
+#      - --entry-point=AddScreening
+#      - --region=us-east1
+#      - --env-vars-file=env.yaml
+#      - --allow-unauthenticated
+#    dir: ./fns
 substitutions:
   _KEYRING: functions-deployment
   _KEY: entry-screening-func

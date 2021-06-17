@@ -1,0 +1,53 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - kms
+      - decrypt
+      - --ciphertext-file=env.production.yaml.enc
+      - --plaintext-file=./env.yaml
+      - --location=global
+      - --keyring=${_KEYRING}
+      - --key=${_KEY}
+      - --verbosity=debug
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "New Persons"
+    args:
+    - functions
+    - deploy
+    - 'PersonsHook'
+    - --trigger-event=providers/cloud.firestore/eventTypes/document.create
+    - --trigger-resource=projects/epi-belize/databases/(default)/documents/persons/{pushId}
+    - --runtime=go113
+    - --entry-point=PersonsHook
+    - --region=us-east1
+    - --env-vars-file=env.yaml
+    dir: .
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "Person Updated"
+    args:
+    - functions
+    - deploy
+    - 'PersonUpdatedListener'
+    - --trigger-event=providers/cloud.firestore/eventTypes/document.update
+    - --trigger-resource=projects/epi-belize/databases/(default)/documents/screenings/{pushId}
+    - --runtime=go113
+    - --entry-point=PersonUpdatedListener
+    - --region=us-east1
+    - --env-vars-file=env.yaml
+    dir: .
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "Person Deleted"
+    args:
+    - functions
+    - deploy
+    - 'PersonDeletedListener'
+    - --trigger-event=providers/cloud.firestore/eventTypes/document.delete
+    - --trigger-resource=projects/epi-belize/databases/(default)/documents/screenings/{pushId}
+    - --runtime=go113
+    - --entry-point=PersonDeletedListener
+    - --region=us-east1
+    - --env-vars-file=env.yaml
+    dir: .
+substitutions:
+  _KEYRING: functions-deployment
+  _KEY: entry-screening-func
