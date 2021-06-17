@@ -4,7 +4,7 @@ steps:
       - kms
       - decrypt
       - --ciphertext-file=env.production.yaml.enc
-      - --plaintext-file=./fns/env.yaml
+      - --plaintext-file=./env.yaml
       - --location=global
       - --keyring=${_KEYRING}
       - --key=${_KEY}
