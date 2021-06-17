@@ -1,0 +1,27 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - kms
+      - decrypt
+      - --ciphertext-file=env.production.yaml.enc
+      - --plaintext-file=./env.yaml
+      - --location=global
+      - --keyring=${_KEYRING}
+      - --key=${_KEY}
+      - --verbosity=debug
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: "Firesearch Access Keys"
+    args:
+    - functions
+    - deploy
+    - 'FiresearchAccessKey'
+    - --trigger-http
+    - --runtime=go113
+    - --entry-point=AccessKeyFn
+    - --region=us-east1
+    - --env-vars-file=env.yaml
+    - --allow-unauthenticated
+    dir: .
+substitutions:
+  _KEYRING: functions-deployment
+  _KEY: entry-screening-func
