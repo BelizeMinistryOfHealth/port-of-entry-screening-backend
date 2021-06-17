@@ -92,6 +92,7 @@ type Case struct {
 	Addresses                    []Address     `json:"addresses"`
 	Questionnaire                Questionnaire `json:"questionnaireAnswers"`
 	VisualID                     string        `json:"visualId"`
+	Vaccines                     []Vaccination `json:"vaccinesReceived"`
 }
 
 // Person is a representation of a person in GoData
@@ -111,14 +112,30 @@ type Person struct {
 	VisualID                     string        `json:"visualId"`
 }
 
+// VaccineStatus is a person's COVID19 vaccination status
 type VaccineStatus string
+
+// VaccineDose is the COVID19 vaccine a person received
 type VaccineDose string
 
 const (
-	vaccinated    VaccineStatus = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS_VACCINATED"
-	notVaccinated VaccineStatus = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS_NOT_VACCINATED"
-	astraFirst    VaccineDose   = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_ASTRAZENECA_1ST_DOSE"
-	astraSecond   VaccineDose   = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_ASTRAZENECA_2ND_DOSE"
+	// Vaccinated indicates that a person is vaccinated
+	Vaccinated VaccineStatus = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS_VACCINATED"
+	// NotVaccinated indicates that a person is not vaccinated
+	NotVaccinated VaccineStatus = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS_NOT_VACCINATED"
+	// AstraFirst is the first dose of AstraZeneca
+	AstraFirst VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_ASTRAZENECA_1ST_DOSE"
+	// AstraSecond is the second dose of AstraZeneca
+	AstraSecond   VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_ASTRAZENECA_2ND_DOSE"
+	Johnson       VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_JOHNSON_JOHNSON"
+	ModernaFirst  VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_MODERNA_1ST_DOSE"
+	ModernaSecond VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_MODERNA_2ND_DOSE"
+	PfizerFirst   VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_PFIZER_1ST_DOSE"
+	PfizerSecond  VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_PFIZER_2ND_DOSE"
+	SinoFirst     VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_SINOPHARM_1ST_DOSE"
+	SinoSecond    VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_SINOPHARM_2ND_DOSE"
+	SputnikFirst  VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_SPUTNIK_1ST_DOSE"
+	SputnikSecond VaccineDose = "LNG_REFERENCE_DATA_CATEGORY_VACCINE_SPUTNIK_2ND_DOSE"
 )
 
 // Vaccination structure in Godata is an array:

@@ -21,6 +21,7 @@ type CaseArg struct {
 	Screening    models.Screening
 	ArrivalInfo  models.ArrivalInfo
 	Address      models.AddressInBelize
+	Vaccination  models.Vaccination
 	VisualID     string
 }
 
@@ -153,11 +154,65 @@ func (a *api) GetCaseByVisualID(visualID string, opts Options) (CaseID, error) {
 	return resps[0], nil
 }
 
+func toVaccine(vacc models.Vaccination) Vaccination {
+	var vaccine VaccineDose
+
+	if len(vacc.Name) > 0 && vacc.NumberOfShots > 0 {
+		switch vacc.Name {
+		case "Astra Zeneca":
+			if vacc.NumberOfShots == 1 {
+				vaccine = AstraFirst
+			} else {
+				vaccine = AstraSecond
+			}
+			break
+		case "Pfizer":
+			if vacc.NumberOfShots == 1 {
+				vaccine = PfizerFirst
+			} else {
+				vaccine = PfizerSecond
+			}
+			break
+		case "Johnson & Johnson":
+			vaccine = Johnson
+			break
+		case "Moderna":
+			if vacc.NumberOfShots == 1 {
+				vaccine = ModernaFirst
+			} else {
+				vaccine = ModernaSecond
+			}
+			break
+		case "Sinopharm":
+			if vacc.NumberOfShots == 1 {
+				vaccine = SinoFirst
+			} else {
+				vaccine = SinoSecond
+			}
+			break
+		case "Sputnik":
+			if vacc.NumberOfShots == 1 {
+				vaccine = SputnikFirst
+			} else {
+				vaccine = SputnikSecond
+			}
+			break
+		}
+		return Vaccination{
+			Vaccine: vaccine,
+			Status:  Vaccinated,
+			Date:    vacc.DateOfMostRecentShot,
+		}
+	}
+	return Vaccination{}
+}
+
 func newCase(args CaseArg) Case {
 	screening := args.Screening
 	personalInfo := args.PersonalInfo
 	arrivalInfo := args.ArrivalInfo
 	visualID := args.VisualID
+	vaccine := toVaccine(args.Vaccination)
 	address := eventToGoDataAddress(args.Address, personalInfo, arrivalInfo.DateOfArrival)
 	var caseType = "Non-Tourist"
 	if strings.ToLower(arrivalInfo.PurposeOfTrip) == "tourist" {
@@ -165,7 +220,7 @@ func newCase(args CaseArg) Case {
 	}
 
 	goDataQuestionnaire := createGoDataQuestionnaire(personalInfo, screening, arrivalInfo, caseType)
-	return createGoDataCase(goDataQuestionnaire, []Address{address}, personalInfo, visualID)
+	return createGoDataCase(goDataQuestionnaire, []Address{address}, personalInfo, vaccine, visualID)
 }
 
 // UpdateCase makes a put request to GoData to update an existing case.
@@ -511,7 +566,7 @@ func createGoDataQuestionnaire(personalInfo models.PersonalInfo, screening model
 	return godataQuestionnaire
 }
 
-func createGoDataCase(goDataQuestionnaire Questionnaire, addresses []Address, personalInfo models.PersonalInfo, visualID string) Case {
+func createGoDataCase(goDataQuestionnaire Questionnaire, addresses []Address, personalInfo models.PersonalInfo, vaccine Vaccination, visualID string) Case {
 	gender := "LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE"
 	if personalInfo.Gender == "Female" {
 		gender = "LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE"
@@ -529,5 +584,6 @@ func createGoDataCase(goDataQuestionnaire Questionnaire, addresses []Address, pe
 		Addresses:                    addresses,
 		Questionnaire:                goDataQuestionnaire,
 		VisualID:                     visualID,
+		Vaccines:                     []Vaccination{vaccine},
 	}
 }

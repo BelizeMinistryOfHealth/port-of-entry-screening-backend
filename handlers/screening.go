@@ -32,6 +32,7 @@ func ScreeningEventHandler(
 	outbreakID := os.Getenv("OUTBREAK_ID")
 
 	screening := event.Value.Fields.ToScreening()
+	vaccination := event.Value.Fields.Vaccination.ToVaccination()
 	arrivalInfo, arrivalErr := arrivalStore.GetByID(ctx, screening.ID)
 	if arrivalErr != nil {
 		return fmt.Errorf("error: can not push to GoData without arrival info: %w", arrivalErr)
@@ -54,8 +55,9 @@ func ScreeningEventHandler(
 	httpClient := http.Client{}
 	goAPI := godata.NewAPI(godataURL, &httpClient)
 	caseID, err := goAPI.GetCaseByVisualID(ID, godata.Options{
-		URL:   godataURL,
-		Token: godataToken,
+		URL:        godataURL,
+		Token:      godataToken,
+		OutbreakID: outbreakID,
 	})
 
 	log.WithFields(log.Fields{
@@ -68,9 +70,14 @@ func ScreeningEventHandler(
 		Screening:    screening,
 		ArrivalInfo:  arrivalInfo,
 		Address:      address,
+		Vaccination:  vaccination,
 		VisualID:     ID,
 	}
-	if err != nil || len(caseID.ID) > 0 {
+
+	// GoData returns an error if we try to retrieve a case by a visualID that does not exist.
+	// So when the err is not nil and that the caseID.ID is not empty, then we can assume
+	// that the case exists and we should do an `update` instead of `creating` a new case.
+	if err == nil && len(caseID.ID) > 0 {
 		// PUT
 		if err := goAPI.UpdateCase(arg, caseID.ID, godata.Options{
 			URL:        godataURL,
@@ -84,16 +91,16 @@ func ScreeningEventHandler(
 			}).WithError(err).Error("failed to update godata case")
 			return fmt.Errorf("error updating GoData case: %w", err)
 		}
-	}
-
-	if err := goAPI.CreateCase(arg,
-		godata.Options{URL: godataURL, Token: godataToken, OutbreakID: outbreakID}); err != nil {
-		log.WithFields(log.Fields{
-			"screening":    screening,
-			"personalInfo": personalInfo,
-			"caseID":       caseID,
-		}).WithError(err).Error("failed to update godata case")
-		return fmt.Errorf("error creating new GoData case: %w", err)
+	} else {
+		if err := goAPI.CreateCase(arg,
+			godata.Options{URL: godataURL, Token: godataToken, OutbreakID: outbreakID}); err != nil {
+			log.WithFields(log.Fields{
+				"screening":    screening,
+				"personalInfo": personalInfo,
+				"caseID":       caseID,
+			}).WithError(err).Error("failed to update godata case")
+			return fmt.Errorf("error creating new GoData case: %w", err)
+		}
 	}
 
 	return nil

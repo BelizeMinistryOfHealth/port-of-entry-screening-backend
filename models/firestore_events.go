@@ -423,6 +423,11 @@ type StringValueStruct struct {
 	StringValue string `json:"stringValue"`
 }
 
+// IntValueStruct represents an int value in a Firestore Event
+type IntValueStruct struct {
+	IntValue string `json:"intValue"`
+}
+
 // TimestampValueStruct represents a time value in a Firestore event
 type TimestampValueStruct struct {
 	TimestampValue time.Time `json:"timestampValue"`
