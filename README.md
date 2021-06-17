@@ -14,3 +14,26 @@ Decrypt the file:
 ```
 gcloud kms decrypt --ciphertext-file=<ENCRYPTED_FILE> --plaintext-file=<OUTPUT_FILE> --location=global --keyring=functions-deployment --key=entry-screening-func --verbosity=debug 
 ```
+
+
+## Deploying
+The project uses [Google's Cloud Build](https://cloud.google.com/build/docs/quickstarts) for building and deploying.
+There are a series of cloud build files per `feature`. This is to avoid having to redeploy the entire project if only
+a few functions were changed:
+
+- cloudbuild.screening-updates.yaml deploys all cloud functions related to firestore triggers when the screening collection changes.
+- cloudbuild.persons.yaml deploys all functions related to the firestore triggers when the persons collection changes.
+- 
+
+### Deploying from the cli
+
+Persons Functions
+```
+gcloud builds submit --config=cloudbuild.persons.yaml --async --format=json
+```
+
+
+Screnings Functions
+```
+gcloud builds submit --config=cloudbuild.screening-updates.yaml --async --format=json
+```
