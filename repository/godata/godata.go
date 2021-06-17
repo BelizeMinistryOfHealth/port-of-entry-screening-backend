@@ -197,6 +197,13 @@ func toVaccine(vacc models.Vaccination) Vaccination {
 				vaccine = SputnikSecond
 			}
 			break
+		case "Sinovac":
+			if vacc.NumberOfShots == 1 {
+				vaccine = SinovacFirst
+			} else {
+				vaccine = SinovacSecond
+			}
+			break
 		}
 		return Vaccination{
 			Vaccine: vaccine,
