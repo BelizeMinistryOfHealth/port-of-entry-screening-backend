@@ -179,6 +179,17 @@ func TestSearch(t *testing.T) {
 		}
 	}
 	t.Logf("withPorts: %v", withPorts)
+
+	delResp, err := firesearchService.IndexService.DeleteDoc(ctx, firesearch.DeleteDocRequest{
+		IndexPath: indexPath,
+		ID:        "NONE HERE",
+	})
+
+	if err != nil {
+		t.Fatalf("delete failed: %v", err)
+	}
+
+	t.Logf("delResp: %v", delResp)
 }
 
 func hasPoe(fields []firesearch.Field) bool {
