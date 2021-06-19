@@ -121,6 +121,9 @@ func PersonDeletedListener(ctx context.Context, event models.FirestorePersonEven
 // PersonUpdatedListener is triggered when a record is updated in the persons collection
 func PersonUpdatedListener(ctx context.Context, event models.FirestorePersonEvent) error {
 	personStore := firesearch.PersonStore{Service: personFiresearchService}
+	log.WithFields(log.Fields{
+		"event": event,
+	}).Info("updating person record")
 	result, err := handlers.PersonCreated(ctx, event, personStore)
 	if err != nil {
 		log.WithError(err).Info("update person failed")
