@@ -449,6 +449,7 @@ type PersonFirestoreFields struct {
 	OtherTravelDocumentID StringValueStruct `json:"otherTravelDocumentId"`
 	Email                 StringValueStruct `json:"email"`
 	BhisNumber            StringValueStruct `json:"bhisNumber"`
+	PortOfEntry           StringValueStruct `json:"portOfEntry"`
 	Occupation            StringValueStruct `json:"occupation"`
 	CreatedBy             struct {
 		MapValueStruct struct {
@@ -488,6 +489,7 @@ func (p *PersonFirestoreFields) ToPerson() PersonalInfo {
 		PhoneNumbers:          p.PhoneNumbers.StringValue,
 		BhisNumber:            p.BhisNumber.StringValue,
 		Occupation:            p.Occupation.StringValue,
+		PortOfEntry:           p.PortOfEntry.StringValue,
 		Created:               p.Created.TimestampValue,
 		Modified:              p.Modified.TimestampValue,
 		CreatedBy: Editor{

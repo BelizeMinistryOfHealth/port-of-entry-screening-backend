@@ -51,6 +51,10 @@ func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalIn
 					Value: fmt.Sprintf("%d", person.Created.Month()),
 					Store: true,
 				},
+				{
+					Key:   "portOfEntry",
+					Value: person.PortOfEntry,
+				},
 			},
 			Fields: []firesearch.Field{
 				{

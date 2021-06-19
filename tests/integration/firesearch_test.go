@@ -122,3 +122,57 @@ func TestPutDoc(t *testing.T) {
 	}
 	t.Logf("search result: %v", searchResult)
 }
+
+func TestSearch(t *testing.T) {
+	ctx := context.Background()
+	indexPath := "firesearch/indexes/persons_index"
+	keyReq := firesearch.GenerateKeyRequest{IndexPathPrefix: "firesearch/indexes/persons_index"}
+	firesearchService := firesearch2.CreateFiresearchService(
+		"Persons Index",
+		indexPath,
+		"PGIA")
+	accessKeyService := firesearch.NewAccessKeyService(firesearchService.Client)
+	keyResp, err := accessKeyService.GenerateKey(ctx, keyReq)
+	if err != nil {
+		t.Fatalf("GenerateKey failed: %v", err)
+	}
+	accessKey := keyResp.AccessKey
+	searchRequest := firesearch.SearchRequest{
+		Query: firesearch.SearchQuery{
+			IndexPath: indexPath,
+			AccessKey: accessKey,
+			Limit:     100,
+			Text:      "2021",
+			Filters: []firesearch.Field{
+				//{
+				//	Key: "portOfEntry",
+				//	Value: "PGIA",
+				//},
+				{
+					Key:   "year",
+					Value: "2021",
+				},
+				{
+					Key:   "month",
+					Value: "6",
+				},
+				{
+					Key:   "day",
+					Value: 19,
+				},
+			},
+			Select:       []string{"year", "fullName", "month", "day", "nationality", "portOfEntry"},
+			SearchFields: []string{"year"},
+			Cursor:       "",
+		},
+	}
+	resp, err := firesearchService.IndexService.Search(ctx, searchRequest)
+	if err != nil {
+		t.Fatalf("error searching index: %v", err)
+	}
+	//t.Logf("Hits: %v", resp.Hits)
+	for _, r := range resp.Hits {
+		t.Logf("hit: %v", r.Fields)
+	}
+
+}
