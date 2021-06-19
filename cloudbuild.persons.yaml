@@ -29,7 +29,7 @@ steps:
     - deploy
     - 'PersonUpdatedListener'
     - --trigger-event=providers/cloud.firestore/eventTypes/document.update
-    - --trigger-resource=projects/epi-belize/databases/(default)/documents/screenings/{pushId}
+    - --trigger-resource=projects/epi-belize/databases/(default)/documents/persons/{pushId}
     - --runtime=go113
     - --entry-point=PersonUpdatedListener
     - --region=us-east1
@@ -42,7 +42,7 @@ steps:
     - deploy
     - 'PersonDeletedListener'
     - --trigger-event=providers/cloud.firestore/eventTypes/document.delete
-    - --trigger-resource=projects/epi-belize/databases/(default)/documents/screenings/{pushId}
+    - --trigger-resource=projects/epi-belize/databases/(default)/documents/persons/{pushId}
     - --runtime=go113
     - --entry-point=PersonDeletedListener
     - --region=us-east1

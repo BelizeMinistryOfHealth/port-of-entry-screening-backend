@@ -171,8 +171,25 @@ func TestSearch(t *testing.T) {
 		t.Fatalf("error searching index: %v", err)
 	}
 	//t.Logf("Hits: %v", resp.Hits)
+	var withPorts [][]firesearch.Field
 	for _, r := range resp.Hits {
 		t.Logf("hit: %v", r.Fields)
+		if hasPoe(r.Fields) {
+			withPorts = append(withPorts, r.Fields)
+		}
+	}
+	t.Logf("withPorts: %v", withPorts)
+}
+
+func hasPoe(fields []firesearch.Field) bool {
+	has := false
+
+	for _, f := range fields {
+		if f.Key == "portOfEntry" && f.Value != nil {
+			has = true
+			return has
+		}
 	}
 
+	return has
 }
