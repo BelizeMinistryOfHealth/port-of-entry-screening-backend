@@ -16,6 +16,11 @@ type PersonStore struct {
 
 // CreatePerson creates a new person record in Firesearch.
 func (c *PersonStore) CreatePerson(ctx context.Context, person models.PersonalInfo) error {
+	c.Service.IndexService.DeleteDoc(ctx, firesearch.DeleteDocRequest{
+		IndexPath: c.Service.IndexPath,
+		ID:        person.ID,
+	})
+
 	putDocReq := firesearch.PutDocRequest{
 		IndexPath: c.Service.IndexPath,
 		Doc: firesearch.Doc{

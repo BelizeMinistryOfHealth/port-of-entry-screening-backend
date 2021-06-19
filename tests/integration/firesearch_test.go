@@ -161,7 +161,7 @@ func TestSearch(t *testing.T) {
 					Value: 19,
 				},
 			},
-			Select:       []string{"year", "fullName", "month", "day", "nationality", "portOfEntry"},
+			Select:       []string{"year", "fullName", "month", "middleName", "day", "nationality", "portOfEntry"},
 			SearchFields: []string{"year"},
 			Cursor:       "",
 		},
