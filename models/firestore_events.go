@@ -394,6 +394,7 @@ type ArrivalFields struct {
 	PortOfEntry          StringValueStruct    `json:"portOfEntry"`
 	DateOfArrival        TimestampValueStruct `json:"dateOfArrival"`
 	CountryOfEmbarkation StringValueStruct    `json:"countryOfEmbarkation"`
+	PurposeOfTrip        StringValueStruct    `json:"purposeOfTrip"`
 }
 
 // FirestoreArrivalValue is the `value` field in a firestore event

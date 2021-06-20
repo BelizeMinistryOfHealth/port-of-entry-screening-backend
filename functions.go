@@ -209,6 +209,21 @@ func registrationFn(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ArrivalsListener subscribes to events on the arrivals collection
+func ArrivalsListener(ctx context.Context, event models.FirestoreArrivalEvent) error {
+	firesearchService := firesearch.CreateFiresearchService("Arrivals Stat Index", "arrivals_stat_index", "NA")
+	arrivalsStore := firesearch.ArrivalsStore{Service: firesearchService}
+	res, err := handlers.ArrivalStatEvent(ctx, event, arrivalsStore)
+	if err != nil {
+		return fmt.Errorf("failure in the arrivals listener: %w", err)
+	}
+	log.WithFields(log.Fields{
+		"event": event,
+		"stat":  res.ArrivalStat,
+	}).Info("successfully processed an arrival event")
+	return nil
+}
+
 // GetServer exposes Server to modify some settings
 func GetServer() *Server {
 	return &server

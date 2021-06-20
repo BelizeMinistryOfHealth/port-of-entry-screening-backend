@@ -161,7 +161,7 @@ func TestSearch(t *testing.T) {
 					Value: 20,
 				},
 			},
-			Select:       []string{"year", "fullName", "month", "middleName", "day", "nationality", "portOfEntry"},
+			Select:       []string{"year", "fullName", "month", "middleName", "day", "nationality", "portOfEntry", "id"},
 			SearchFields: []string{"year"},
 			Cursor:       "",
 		},
@@ -174,12 +174,14 @@ func TestSearch(t *testing.T) {
 	t.Logf("TOTAL HITS: %d", len(resp.Hits))
 	var withPorts [][]firesearch.Field
 	for _, r := range resp.Hits {
-		t.Logf("hit: %v", r.Fields)
 		if hasPoe(r.Fields) {
 			withPorts = append(withPorts, r.Fields)
 		}
 	}
-	t.Logf("withPorts: %v", withPorts)
+	for _, r := range withPorts {
+		t.Logf("%v", r)
+	}
+	t.Logf("Total: %d", len(withPorts))
 
 }
 
