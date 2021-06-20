@@ -269,155 +269,6 @@ func (f *FirestoreScreenings) ToScreening() Screening {
 	}
 }
 
-// ArrivalFirestoreFields is how the arrivals are represented in a Firestore event
-type ArrivalFirestoreFields struct {
-	PersonalInfo struct {
-		MapValue struct {
-			Fields struct {
-				PhoneNumbers struct {
-					StringValue string `json:"stringValue"`
-				} `json:"phoneNumbers"`
-				Gender struct {
-					StringValue string `json:"stringValue"`
-				} `json:"gender"`
-				OtherTravelDocument struct {
-					StringValue string `json:"stringValue"`
-				} `json:"otherTravelDocument"`
-				FullName struct {
-					StringValue string `json:"stringValue"`
-				} `json:"fullName"`
-				Dob struct {
-					StringValue string `json:"stringValue"`
-				} `json:"dob"`
-				MiddleName struct {
-					StringValue string `json:"stringValue"`
-				} `json:"middleName"`
-				OtherTravelDocumentID struct {
-					StringValue string `json:"stringValue"`
-				} `json:"otherTravelDocumentId"`
-				LastName struct {
-					StringValue string `json:"stringValue"`
-				} `json:"lastName"`
-				FirstName struct {
-					StringValue string `json:"stringValue"`
-				} `json:"firstName"`
-				PassportNumber struct {
-					StringValue string `json:"stringValue"`
-				} `json:"passportNumber"`
-				Email struct {
-					StringValue string `json:"stringValue"`
-				} `json:"email"`
-				Nationality struct {
-					StringValue string `json:"stringValue"`
-				} `json:"nationality"`
-				BhisNumber struct {
-					StringValue string `json:"stringValue"`
-				} `json:"bhisNumber"`
-				Occupation struct {
-					StringValue string `json:"stringValue"`
-				} `json:"occupation"`
-			} `json:"fields"`
-		} `json:"mapValue"`
-	} `json:"personalInfo"`
-	Arrivals struct {
-		MapValue struct {
-			Fields struct {
-				QuarantineLocation struct {
-					StringValue string `json:"stringValue"`
-				} `json:"quarantineLocation"`
-				Created struct {
-					StringValue string `json:"stringValue"`
-				} `json:"created"`
-				ContactPersonPhoneNumber struct {
-					StringValue string `json:"stringValue"`
-				} `json:"contactPersonPhoneNumber"`
-				ContactPerson struct {
-					StringValue string `json:"stringValue"`
-				} `json:"contactPerson"`
-				ArrivalInfo struct {
-					MapValue struct {
-						Fields struct {
-							CountriesVisited struct {
-								StringValue string `json:"stringValue"`
-							} `json:"countriesVisited"`
-							ModeOfTravel struct {
-								StringValue string `json:"stringValue"`
-							} `json:"modeOfTravel"`
-							PortOfEntry struct {
-								StringValue string `json:"stringValue"`
-							} `json:"portOfEntry"`
-							VesselNumber struct {
-								StringValue string `json:"stringValue"`
-							} `json:"vesselNumber"`
-							DateOfArrival struct {
-								StringValue string `json:"stringValue"`
-							} `json:"dateOfArrival"`
-							TravelOrigin struct {
-								StringValue string `json:"stringValue"`
-							} `json:"travelOrigin"`
-							CountryOfEmbarkation struct {
-								StringValue string `json:"stringValue"`
-							} `json:"countryOfEmbarkation"`
-							DateOfEmbarkation struct {
-								StringValue string `json:"stringValue"`
-							} `json:"dateOfEmbarkation"`
-						} `json:"fields"`
-					} `json:"mapValue"`
-				} `json:"arrivalInfo"`
-				Modified struct {
-					StringValue string `json:"stringValue"`
-				} `json:"modified"`
-				Addresses     FirestoreAddresses `json:"addresses"`
-				PurposeOfTrip struct {
-					StringValue string `json:"stringValue"`
-				} `json:"purposeOfTrip"`
-				//Screenings           FirestoreScreenings `json:"screenings"`
-				TravellingCompanions struct {
-					NullValue interface{} `json:"nullValue"`
-				} `json:"travellingCompanions"`
-				LengthStay struct {
-					StringValue interface{} `json:"nullValue"`
-				} `json:"lengthStay"`
-			} `json:"fields"`
-		} `json:"mapValue"`
-	} `json:"arrivals"`
-	Modified struct {
-		StringValue string `json:"stringValue"`
-	} `json:"modified"`
-	Created struct {
-		StringValue string `json:"stringValue"`
-	} `json:"created"`
-	PortOfEntry struct {
-		StringValue string `json:"stringValue"`
-	} `json:"portOfEntry"`
-	ID struct {
-		StringValue string `json:"stringValue"`
-	} `json:"id"`
-	ObjectID struct {
-		StringValue string `json:"stringValue"`
-	} `json:"objectID"`
-}
-
-// FirestoreArrivalEvent is the payload of a Firestore event.
-type FirestoreArrivalEvent struct {
-	OldValue   FirestoreArrivalValue `json:"oldValue"`
-	Value      FirestoreArrivalValue `json:"value"`
-	UpdateMask struct {
-		FieldPaths []string `json:"fieldPaths"`
-	} `json:"updateMask"`
-}
-
-// FirestoreArrivalValue holds Firestore fields.
-type FirestoreArrivalValue struct {
-	CreateTime time.Time `json:"createTime"`
-	// Fields is the data for this value. The type depends on the format of your
-	// database. Log an interface{} value and inspect the result to see a JSON
-	// representation of your database fields.
-	Fields     ArrivalFirestoreFields `json:"fields"`
-	Name       string                 `json:"name"`
-	UpdateTime time.Time              `json:"updateTime"`
-}
-
 // StringValueStruct represents a string value in a Firestore Event
 type StringValueStruct struct {
 	StringValue string `json:"stringValue"`
@@ -535,4 +386,29 @@ type FirestoreScreeningValue struct {
 	Fields     FirestoreScreenings `json:"fields"`
 	Name       string              `json:"name"`
 	UpdateTime time.Time           `json:"updateTime"`
+}
+
+// ArrivalFields represents the fields of the arrival record in a firestore event.
+type ArrivalFields struct {
+	ID                   StringValueStruct    `json:"id"`
+	PortOfEntry          StringValueStruct    `json:"portOfEntry"`
+	DateOfArrival        TimestampValueStruct `json:"dateOfArrival"`
+	CountryOfEmbarkation StringValueStruct    `json:"countryOfEmbarkation"`
+}
+
+// FirestoreArrivalValue is the `value` field in a firestore event
+type FirestoreArrivalValue struct {
+	CreateTime time.Time     `json:"createTime"`
+	Fields     ArrivalFields `json:"fields"`
+	Name       string        `json:"name"`
+	UpdateTime time.Time     `json:"updateTime"`
+}
+
+// FirestoreArrivalEvent represents the event triggered from the arrivals firestore collection
+type FirestoreArrivalEvent struct {
+	OldValue   FirestoreArrivalValue `json:"oldValue"`
+	Value      FirestoreArrivalValue `json:"value"`
+	UpdateMask struct {
+		FieldPaths []string `json:"fieldPaths"`
+	} `json:"updateMask"`
 }

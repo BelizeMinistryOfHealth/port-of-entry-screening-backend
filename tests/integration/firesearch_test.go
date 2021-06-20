@@ -158,7 +158,7 @@ func TestSearch(t *testing.T) {
 				},
 				{
 					Key:   "day",
-					Value: 19,
+					Value: 20,
 				},
 			},
 			Select:       []string{"year", "fullName", "month", "middleName", "day", "nationality", "portOfEntry"},
@@ -171,6 +171,7 @@ func TestSearch(t *testing.T) {
 		t.Fatalf("error searching index: %v", err)
 	}
 	//t.Logf("Hits: %v", resp.Hits)
+	t.Logf("TOTAL HITS: %d", len(resp.Hits))
 	var withPorts [][]firesearch.Field
 	for _, r := range resp.Hits {
 		t.Logf("hit: %v", r.Fields)
@@ -180,16 +181,6 @@ func TestSearch(t *testing.T) {
 	}
 	t.Logf("withPorts: %v", withPorts)
 
-	delResp, err := firesearchService.IndexService.DeleteDoc(ctx, firesearch.DeleteDocRequest{
-		IndexPath: indexPath,
-		ID:        "NONE HERE",
-	})
-
-	if err != nil {
-		t.Fatalf("delete failed: %v", err)
-	}
-
-	t.Logf("delResp: %v", delResp)
 }
 
 func hasPoe(fields []firesearch.Field) bool {
