@@ -35,3 +35,6 @@ steps:
   - --region=us-east1
   - --env-vars-file=env.yaml
   dir: .
+substitutions:
+  _KEYRING: functions-deployment
+  _KEY: entry-screening-func
