@@ -23,7 +23,7 @@ steps:
   - --env-vars-file=env.yaml
   dir: .
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: "New Arrival"
+  id: "Update Arrival"
   args:
   - functions
   - deploy
