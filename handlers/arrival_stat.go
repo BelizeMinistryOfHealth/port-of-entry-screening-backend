@@ -33,3 +33,10 @@ func ArrivalStatEvent(ctx context.Context, event models.FirestoreArrivalEvent, s
 		ArrivalStat: arrivalStat,
 	}, nil
 }
+
+func ArrivalDeleted(ctx context.Context, arrivalStore firesearch.ArrivalsStore, ID string) error {
+	if err := arrivalStore.DeleteDoc(ctx, ID); err != nil {
+		return fmt.Errorf("ArrivalDeleted() failed: %w", err)
+	}
+	return nil
+}

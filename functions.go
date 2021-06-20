@@ -224,6 +224,16 @@ func ArrivalsListener(ctx context.Context, event models.FirestoreArrivalEvent) e
 	return nil
 }
 
+func ArrivalsDeletedListener(ctx context.Context, event models.FirestoreArrivalEvent) error {
+	firesearchService := firesearch.CreateFiresearchService("Arrivals Stat Index", "arrivals_stat_index", "NA")
+	arrivalsStore := firesearch.ArrivalsStore{Service: firesearchService}
+	ID := event.OldValue.Fields.ID.StringValue
+	if err := handlers.ArrivalDeleted(ctx, arrivalsStore, ID); err != nil {
+		return fmt.Errorf("failed to delete arrival: %w", err)
+	}
+	return nil
+}
+
 // GetServer exposes Server to modify some settings
 func GetServer() *Server {
 	return &server

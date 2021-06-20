@@ -35,6 +35,19 @@ steps:
   - --region=us-east1
   - --env-vars-file=env.yaml
   dir: .
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: "Delete Arrival"
+  args:
+  - functions
+  - deploy
+  - 'ArrivalDeleteSub'
+  - --trigger-event=providers/cloud.firestore/eventTypes/document.delete
+  - --trigger-resource=projects/epi-belize/databases/(default)/documents/arrivals/{pushId}
+  - --runtime=go113
+  - --entry-point=ArrivalsDeletedListener
+  - --region=us-east1
+  - --env-vars-file=env.yaml
+  dir: .
 substitutions:
   _KEYRING: functions-deployment
   _KEY: entry-screening-func

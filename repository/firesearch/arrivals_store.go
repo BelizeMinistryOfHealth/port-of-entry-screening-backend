@@ -59,12 +59,12 @@ func (c *ArrivalsStore) PutDoc(ctx context.Context, arrival models.ArrivalStat) 
 	return nil
 }
 
-func (c *ArrivalsStore) getDoc(ctx context.Context, id, accessKey string) (models.ArrivalStat, error) {
+func (c *ArrivalsStore) getDoc(ctx context.Context, ID, accessKey string) (models.ArrivalStat, error) {
 	req := firesearch.SearchRequest{Query: firesearch.SearchQuery{
 		IndexPath: c.Service.IndexPath,
 		AccessKey: accessKey,
 		Limit:     1,
-		Text:      id,
+		Text:      ID,
 		Filters:   nil,
 		Select: []string{
 			"id",
@@ -96,4 +96,17 @@ func (c *ArrivalsStore) getDoc(ctx context.Context, id, accessKey string) (model
 	}
 	return arrivalStat, nil
 
+}
+
+// DeleteDoc deletes an arrival document from the arrival stat index
+func (c *ArrivalsStore) DeleteDoc(ctx context.Context, ID string) error {
+	deleteDocReq := firesearch.DeleteDocRequest{
+		IndexPath: c.Service.IndexPath,
+		ID:        ID,
+	}
+	_, err := c.Service.IndexService.DeleteDoc(ctx, deleteDocReq)
+	if err != nil {
+		return fmt.Errorf("DeleteDoc() failed: %w", err)
+	}
+	return nil
 }
