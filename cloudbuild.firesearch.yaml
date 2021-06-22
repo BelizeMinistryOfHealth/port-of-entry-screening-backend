@@ -21,6 +21,7 @@ steps:
     - --region=us-east1
     - --env-vars-file=env.yaml
     - --allow-unauthenticated
+    - --security-level=secure-always
     dir: .
   - name: 'gcr.io/cloud-builders/gcloud'
     id: "Firesearch Arrivals Stat Access Keys"
@@ -34,6 +35,7 @@ steps:
     - --region=us-east1
     - --env-vars-file=env.yaml
     - --allow-unauthenticated
+    - --security-level=secure-always
     dir: .
 substitutions:
   _KEYRING: functions-deployment

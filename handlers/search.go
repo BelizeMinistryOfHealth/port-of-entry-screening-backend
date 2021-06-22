@@ -57,7 +57,7 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 	if err != nil {
 		log.WithFields(log.Fields{
 			"message": "JWT verification failed",
-			"handler": "AccessKeyHandler",
+			"handler": "ArrivalsStatAccessKeyHandler",
 		}).WithError(err)
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
@@ -77,7 +77,7 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 	if err != nil {
 		log.WithFields(log.Fields{
 			"message": "could not retrieve firesearch access key",
-			"handler": "AccessKeyHandler",
+			"handler": "ArrivalsStatAccessKeyHandler",
 		}).WithError(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}

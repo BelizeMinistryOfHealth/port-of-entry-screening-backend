@@ -192,7 +192,7 @@ func arrivalsStatAccessKeyHandler(w http.ResponseWriter, r *http.Request) {
 		firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"handler": "AccessKeyFn",
+				"handler": "ArrivalsStatAccessKeyFn",
 				"message": "error creating firestore db connection",
 			}).WithError(err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
