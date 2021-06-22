@@ -181,6 +181,26 @@ func accessKeyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ArrivalsStatAccessKeyFn is the function that returns a firesearch access key
+func ArrivalsStatAccessKeyFn(w http.ResponseWriter, r *http.Request) {
+	Chainz(arrivalsStatAccessKeyHandler, enableCors())(w, r)
+}
+
+func arrivalsStatAccessKeyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		projectID := os.Getenv("PROJECT_ID")
+		firestoreDb, err := firestore.CreateFirestoreDB(r.Context(), projectID)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"handler": "AccessKeyFn",
+				"message": "error creating firestore db connection",
+			}).WithError(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		handlers.ArrivalsStatAccessKeyHandler(*firestoreDb, w, r)
+	}
+}
+
 // RegistrationFn is the REST endpoint for registering a traveller
 func RegistrationFn(w http.ResponseWriter, r *http.Request) {
 	Chainz(registrationFn, enableCors())(w, r)
