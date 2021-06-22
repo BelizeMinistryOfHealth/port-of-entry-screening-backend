@@ -34,7 +34,7 @@ steps:
     - --entry-point=ArrivalsStatAccessKeyFn
     - --region=us-east1
     - --env-vars-file=env.yaml
-    - --allow-unauthenticated
+    - --allow-unauthenticated=true
     - --security-level=secure-always
     dir: .
 substitutions:

@@ -23,6 +23,9 @@ deployFiresearchAccessKey:
 deleteFiresearchAccessKey:
 	gcloud functions delete FiresearchAccessKey
 
+deployFiresearchArrivalStatAccessKey:
+	gcloud alpha functions deploy FiresearchArrivalsStatAccessKey --entry-point ArrivalsStatAccessKeyFn --runtime go113 --trigger-http --env-vars-file env.yaml --region us-east1 --allow-unauthenticated --security-level secure-always --source .
+
 deployScreeningCreatedListener:
 	gcloud functions deploy ScreeningCreatedListener --entry-point ScreeningListener --runtime go113 --trigger-event providers/cloud.firestore/eventTypes/document.create  --region us-east1 --trigger-resource "projects/epi-belize/databases/(default)/documents/screenings/{pushId}" --source . --env-vars-file env.yaml
 
