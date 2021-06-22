@@ -183,6 +183,9 @@ func accessKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 // ArrivalsStatAccessKeyFn is the function that returns a firesearch access key
 func ArrivalsStatAccessKeyFn(w http.ResponseWriter, r *http.Request) {
+	log.WithFields(log.Fields{
+		"headers": r.Header,
+	}).Info("requested access key for arrivals index")
 	Chainz(arrivalsStatAccessKeyHandler, enableCors())(w, r)
 }
 
