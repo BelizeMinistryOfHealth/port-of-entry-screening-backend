@@ -5,6 +5,7 @@ import (
 	"bz.moh.epi/poebackend/repository/firesearch"
 	"context"
 	"fmt"
+	"strings"
 )
 
 // ArrivalStatEventResult is the output of the handler that reacts to arrival events
@@ -17,9 +18,11 @@ type ArrivalStatEventResult struct {
 func ArrivalStatEvent(ctx context.Context, event models.FirestoreArrivalEvent, store firesearch.ArrivalsStore) (ArrivalStatEventResult, error) {
 	fields := event.Value.Fields
 	year, month, _ := fields.DateOfArrival.TimestampValue.Date()
+	date := fields.DateOfArrival.TimestampValue.Format("2006-01-02")
+	d := strings.Split(date, "-")
 	arrivalStat := models.ArrivalStat{
 		ID:                   fields.ID.StringValue,
-		Date:                 fields.DateOfArrival.TimestampValue.Format("2006-01-02"),
+		Date:                 strings.Join(d, ""),
 		Year:                 year,
 		Month:                fmt.Sprintf("%d-%d", year, month),
 		PortOfEntry:          fields.PortOfEntry.StringValue,
