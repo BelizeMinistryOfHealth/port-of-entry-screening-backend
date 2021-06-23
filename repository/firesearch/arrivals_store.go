@@ -28,6 +28,11 @@ func (c *ArrivalsStore) PutDoc(ctx context.Context, arrival models.ArrivalStat) 
 				Store: true,
 			},
 			{
+				Key:   "month",
+				Value: arrival.Month,
+				Store: true,
+			},
+			{
 				Key:   "portOfEntry",
 				Value: arrival.PortOfEntry,
 				Store: true,

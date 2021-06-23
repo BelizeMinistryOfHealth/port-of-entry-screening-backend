@@ -5,6 +5,7 @@ package models
 type ArrivalStat struct {
 	ID                   string `json:"id"`
 	Date                 string `json:"date"`
+	Month                string `json:"month"`
 	Year                 int    `json:"year"`
 	PortOfEntry          string `json:"portOfEntry"`
 	CountryOfEmbarkation string `json:"countryOfEmbarkation"`

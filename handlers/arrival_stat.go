@@ -16,10 +16,13 @@ type ArrivalStatEventResult struct {
 // ArrivalStatEvent handles events from the arrivals collection
 func ArrivalStatEvent(ctx context.Context, event models.FirestoreArrivalEvent, store firesearch.ArrivalsStore) (ArrivalStatEventResult, error) {
 	fields := event.Value.Fields
+	month := fields.DateOfArrival.TimestampValue.Month()
+	year := fields.DateOfArrival.TimestampValue.Year()
 	arrivalStat := models.ArrivalStat{
 		ID:                   fields.ID.StringValue,
 		Date:                 fields.DateOfArrival.TimestampValue.Format("2006-01-02"),
-		Year:                 fields.DateOfArrival.TimestampValue.Year(),
+		Year:                 year,
+		Month:                fmt.Sprintf("%d-%s", year, month.String()),
 		PortOfEntry:          fields.PortOfEntry.StringValue,
 		CountryOfEmbarkation: fields.CountryOfEmbarkation.StringValue,
 		PurposeOfTrip:        fields.PurposeOfTrip.StringValue,
