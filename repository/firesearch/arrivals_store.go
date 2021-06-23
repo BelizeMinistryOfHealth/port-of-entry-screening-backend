@@ -25,10 +25,12 @@ func (c *ArrivalsStore) PutDoc(ctx context.Context, arrival models.ArrivalStat) 
 			{
 				Key:   "year",
 				Value: fmt.Sprintf("%d", arrival.Year),
+				Store: true,
 			},
 			{
 				Key:   "month",
 				Value: arrival.Month,
+				Store: true,
 			},
 			{
 				Key:   "portOfEntry",
