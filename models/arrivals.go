@@ -42,6 +42,7 @@ type ArrivalInfo struct {
 	PurposeOfTrip            string     `json:"purposeOfTrip" firestore:"purposeOfTrip"`
 	ContactPerson            string     `json:"contactPerson" firestore:"contactPerson"`
 	ContactPersonPhoneNumber string     `json:"contactPersonPhoneNumber" firestore:"contactPersonPhoneNumber"`
+	Touch                    bool       `json:"touch" firestore:"touch"`
 	Modified                 *time.Time `json:"modified,omitempty" firestore:"modified"`
 	CreatedBy                Editor     `json:"createdBy" firestore:"createdBy"`
 	ModifiedBy               Editor     `json:"modifiedBy" firestore:"modifiedBy"`

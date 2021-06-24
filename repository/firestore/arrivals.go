@@ -5,6 +5,8 @@ import (
 	fs "cloud.google.com/go/firestore"
 	"context"
 	"fmt"
+	"google.golang.org/api/iterator"
+	"time"
 )
 
 // ArrivalsStoreService store for interacting with persisted arrivals data
@@ -54,6 +56,47 @@ func (p *ArrivalsStoreService) DeleteArrival(ctx context.Context, ID string) err
 	_, err := p.colRef.Doc(ID).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("DeleteArrival failed: %w", err)
+	}
+	return nil
+}
+
+// FindByDateOfArrival retrieves arrivals for a specific date of arrival
+func (p *ArrivalsStoreService) FindByDateOfArrival(ctx context.Context, date time.Time) ([]models.ArrivalInfo, error) {
+	iter := p.colRef.Query.Where("dateOfArrival", ">=", date).
+		Where("dateOfArrival", "<", date.AddDate(0, 0, 1)).
+		Documents(ctx)
+	var arrivals []models.ArrivalInfo
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return []models.ArrivalInfo{}, fmt.Errorf("FindByDateOfArrival error: %w", err)
+		}
+		var arrival models.ArrivalInfo
+		dataErr := doc.DataTo(&arrival)
+		if dataErr != nil {
+			return []models.ArrivalInfo{}, fmt.Errorf("data unmarshal error: %w", err)
+		}
+		arrivals = append(arrivals, arrival)
+	}
+	return arrivals, nil
+}
+
+// BatchUpdate touches all arrivals in a collection
+func (p *ArrivalsStoreService) BatchUpdate(ctx context.Context, arrivals []models.ArrivalInfo) error {
+	batch := p.db.Client.Batch()
+
+	for _, arrival := range arrivals {
+		ref := p.colRef.Doc(arrival.ID)
+		batch.Set(ref, map[string]interface{}{
+			"touched": !arrival.Touch,
+		}, fs.MergeAll)
+	}
+	_, err := batch.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("batch update failed: %w", err)
 	}
 	return nil
 }
