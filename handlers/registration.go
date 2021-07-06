@@ -36,6 +36,10 @@ func RegistrationHandler(args RegistrationArgs, w http.ResponseWriter, r *http.R
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	log.WithFields(log.Fields{
+		"request": req,
+	}).Info("creating new registration")
+
 	editor := models.Editor{
 		ID:    "00000",
 		Email: "system@openstep.net",
