@@ -20,6 +20,7 @@ steps:
     - --entry-point=RegistrationFn
     - --region=us-east1
     - --env-vars-file=env.yaml
+    - --security-level=secure-always
     - --allow-unauthenticated
     dir: .
 substitutions:
