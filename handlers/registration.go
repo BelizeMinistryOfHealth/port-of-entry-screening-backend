@@ -114,16 +114,24 @@ func saveCompanions(ctx context.Context, args RegistrationArgs, req Registration
 		c.ModifiedBy = editor
 		c.Created = now
 		c.Modified = now
-		if err := args.PersonStoreService.CreatePerson(ctx, req.PersonalInfo); err != nil {
+		if err := args.PersonStoreService.CreatePerson(ctx, c); err != nil {
 			return fmt.Errorf("failed to create companion record (%s): %w", c.ID, err)
 		}
 
 		// Create address
+		req.Address.CreatedBy = editor
+		req.Address.ModifiedBy = editor
+		req.Address.Created = &now
+		req.Address.Modified = &now
 		req.Address.ID = c.ID
 		if err := args.AddressStoreService.CreateAddress(ctx, req.Address); err != nil {
 			return fmt.Errorf("failed to create address for companion (%s): %w", c.ID, err)
 		}
 
+		req.ArrivalInfo.CreatedBy = editor
+		req.ArrivalInfo.ModifiedBy = editor
+		req.ArrivalInfo.Created = &now
+		req.ArrivalInfo.Modified = &now
 		req.ArrivalInfo.ID = c.ID
 		if err := args.ArrivalStoreService.CreateArrival(ctx, req.ArrivalInfo); err != nil {
 			return fmt.Errorf("failed to create arrival info for companion (%s): %w", c.ID, err)
