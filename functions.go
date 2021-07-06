@@ -203,6 +203,7 @@ func arrivalsStatAccessKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 // RegistrationFn is the REST endpoint for registering a traveller
 func RegistrationFn(w http.ResponseWriter, r *http.Request) {
+	log.Info("starting registration process....")
 	Chainz(registrationFn, enableCors())(w, r)
 }
 
