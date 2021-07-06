@@ -3,7 +3,9 @@ package handlers
 import (
 	"bz.moh.epi/poebackend/models"
 	"bz.moh.epi/poebackend/repository/firestore"
+	"context"
 	"encoding/json"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
@@ -21,6 +23,7 @@ type RegistrationRequest struct {
 	PersonalInfo models.PersonalInfo    `json:"personalInfo"`
 	ArrivalInfo  models.ArrivalInfo     `json:"arrivalInfo"`
 	Address      models.AddressInBelize `json:"address"`
+	Companions   []models.PersonalInfo  `json:"companions"`
 }
 
 // RegistrationHandler creates a new registration
@@ -76,6 +79,15 @@ func RegistrationHandler(args RegistrationArgs, w http.ResponseWriter, r *http.R
 		return
 	}
 
+	companionErr := saveCompanions(r.Context(), args, req)
+	if companionErr != nil {
+		log.WithFields(log.Fields{
+			"request": req,
+		}).WithError(companionErr).Error("RegistrationHandler(): creating companions failed")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	err := json.NewEncoder(w).Encode("OK")
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -83,4 +95,36 @@ func RegistrationHandler(args RegistrationArgs, w http.ResponseWriter, r *http.R
 		}).WithError(err).Error("encoding response failed")
 		return
 	}
+}
+
+func saveCompanions(ctx context.Context, args RegistrationArgs, req RegistrationRequest) error {
+	companions := req.Companions
+	for _, c := range companions {
+		editor := models.Editor{
+			ID:    "00000",
+			Email: "system@openstep.net",
+		}
+		now := time.Now()
+		// Create person
+		c.CreatedBy = editor
+		c.ModifiedBy = editor
+		c.Created = now
+		c.Modified = now
+		if err := args.PersonStoreService.CreatePerson(ctx, req.PersonalInfo); err != nil {
+			return fmt.Errorf("failed to create companion record (%s): %w", c.ID, err)
+		}
+
+		// Create address
+		req.Address.ID = c.ID
+		if err := args.AddressStoreService.CreateAddress(ctx, req.Address); err != nil {
+			return fmt.Errorf("failed to create address for companion (%s): %w", c.ID, err)
+		}
+
+		req.ArrivalInfo.ID = c.ID
+		if err := args.ArrivalStoreService.CreateArrival(ctx, req.ArrivalInfo); err != nil {
+			return fmt.Errorf("failed to create arrival info for companion (%s): %w", c.ID, err)
+		}
+	}
+
+	return nil
 }
