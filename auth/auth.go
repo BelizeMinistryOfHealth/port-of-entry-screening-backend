@@ -18,10 +18,10 @@ func VerifyToken(ctx context.Context, db firestore.DB, token string) error {
 }
 
 // JwtMiddleware is a middleware that verifies a JWT token
-func JwtMiddleware(db firestore.DB, r *http.Request) error {
+func JwtMiddleware(db firestore.DB, r *http.Request, headerName string) error {
 	ctx := r.Context()
 	h := r.Header
-	bearer := h.Get("X-POE-Authorization")
+	bearer := h.Get(headerName)
 	if len(strings.Trim(bearer, "")) == 0 {
 		// No Authorization Token was provided
 		//http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)

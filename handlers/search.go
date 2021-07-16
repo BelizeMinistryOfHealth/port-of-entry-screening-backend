@@ -17,7 +17,7 @@ type accessKeyResponse struct {
 // AccessKeyHandler returns a firesearch access key
 func AccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *http.Request) {
 	// get an idtoken.
-	err := auth.JwtMiddleware(db, r)
+	err := auth.JwtMiddleware(db, r, "Authorization")
 	if err != nil {
 		log.WithFields(log.Fields{
 			"message": "JWT verification failed",
@@ -56,7 +56,7 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 	log.WithFields(log.Fields{
 		"headers": r.Header,
 	}).Info("validating headers")
-	err := auth.JwtMiddleware(db, r)
+	err := auth.JwtMiddleware(db, r, "X-POE-Authorization")
 	if err != nil {
 		log.WithFields(log.Fields{
 			"message": "JWT verification failed",
