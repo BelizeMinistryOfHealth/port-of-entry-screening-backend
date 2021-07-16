@@ -60,6 +60,7 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 			"handler": "ArrivalsStatAccessKeyHandler",
 		}).WithError(err)
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
 	}
 	ctx := r.Context()
 	log.Info("Creating Firesearch service...")
@@ -80,6 +81,7 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 			"handler": "ArrivalsStatAccessKeyHandler",
 		}).WithError(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 	accessKey := keyResp.AccessKey
 	w.Header().Add("Content-Type", "application/json")
