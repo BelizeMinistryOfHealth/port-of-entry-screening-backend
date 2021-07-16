@@ -21,7 +21,7 @@ func VerifyToken(ctx context.Context, db firestore.DB, token string) error {
 func JwtMiddleware(db firestore.DB, r *http.Request) error {
 	ctx := r.Context()
 	h := r.Header
-	bearer := h.Get("Authorization")
+	bearer := h.Get("X-POE-Authorization")
 	if len(strings.Trim(bearer, "")) == 0 {
 		// No Authorization Token was provided
 		//http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)

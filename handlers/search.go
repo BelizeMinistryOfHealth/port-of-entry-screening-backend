@@ -61,7 +61,7 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 		log.WithFields(log.Fields{
 			"message": "JWT verification failed",
 			"handler": "ArrivalsStatAccessKeyHandler",
-		}).WithError(err).Info("failed to validate jwt")
+		}).WithError(err).Error("failed to validate jwt")
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
