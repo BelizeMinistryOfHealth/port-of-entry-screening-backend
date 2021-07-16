@@ -44,6 +44,11 @@ deployRegistration:
 deleteRegistration:
 	gcloud functions delete RegistrationFn
 
+deployEcho:
+	gcloud alpha functions deploy HandlerEcho --entry-point HandlerEcho --runtime go113 --trigger-http --region us-east1 --security-level secure-always --source .
+
+deleteEcho:
+	gcloud functions delete HandlerEcho
 
 
 ############### Staging ######################

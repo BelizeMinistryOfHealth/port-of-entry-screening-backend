@@ -82,6 +82,7 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 	accessKey := keyResp.AccessKey
+	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(accessKeyResponse{AccessKey: accessKey}) //nolint:errcheck,gosec
 
 }
