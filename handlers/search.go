@@ -53,6 +53,9 @@ func AccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *http.Request) {
 // ArrivalsStatAccessKeyHandler returns a firesearch access key
 func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *http.Request) {
 	// get an idtoken.
+	log.WithFields(log.Fields{
+		"headers": r.Header,
+	}).Info("validating headers")
 	err := auth.JwtMiddleware(db, r)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -85,7 +88,6 @@ func ArrivalsStatAccessKeyHandler(db firestore.DB, w http.ResponseWriter, r *htt
 	}
 	accessKey := keyResp.AccessKey
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(accessKeyResponse{AccessKey: accessKey}) //nolint:errcheck,gosec
 
 }
